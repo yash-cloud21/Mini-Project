@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+{% from "macros.html" import render_field %}
+{% block title %}Subjects — Student Career Platform{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>Subjects</h1>
+    <p>Browse all subjects available on the platform</p>
+</div>
+
+{# ---- Admin: Add Subject Form ---- #}
+{% if current_user.is_admin %}
+<div class="card mb-6">
+    <div class="card-header">
+        <h2 class="card-title">Add New Subject</h2>
+    </div>
+    <form method="POST" action="{{ url_for('academics.add_subject') }}" novalidate>
+        {{ form.hidden_tag() }}
+        <div class="form-row">
+            {{ render_field(form.name, placeholder='e.g. Data Structures') }}
+            {{ render_field(form.code, placeholder='e.g. CS201') }}
+        </div>
+        <div class="form-row">
+            {{ render_field(form.credits, placeholder='e.g. 3') }}
+            {{ render_field(form.semester, placeholder='e.g. 3') }}
+            {{ render_field(form.department, placeholder='e.g. Computer Science') }}
+        </div>
+        {{ form.submit(class="btn btn-primary") }}
+    </form>
+</div>
+{% endif %}
+
+{# ---- Subjects Table ---- #}
+{% if subjects %}
+<div class="card">
+    <div class="card-header">
+        <h2 class="card-title">All Subjects ({{ subjects | length }})</h2>
+    </div>
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Code</th>
+                    <th>Credits</th>
+                    <th>Semester</th>
+                    <th>Department</th>
+                    {% if current_user.is_admin %}<th>Actions</th>{% endif %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for s in subjects %}
+                <tr>
+                    <td><strong>{{ s.name }}</strong></td>
+                    <td><span class="badge badge-primary">{{ s.code }}</span></td>
+                    <td>{{ s.credits }}</td>
+                    <td>{{ s.semester or '—' }}</td>
+                    <td>{{ s.department or '—' }}</td>
+                    {% if current_user.is_admin %}
+                    <td>
+                        <form method="POST" action="{{ url_for('academics.delete_subject', subject_id=s.id) }}"
+                              onsubmit="return confirm('Delete this subject? All related marks, attendance and assignments will also be deleted.');">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                        </form>
+                    </td>
+                    {% endif %}
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% else %}
+<div class="empty-state">
+    <div class="empty-state-icon">📚</div>
+    <h3>No Subjects Yet</h3>
+    <p>
+        {% if current_user.is_admin %}
+            Use the form above to add your first subject.
+        {% else %}
+            Ask an admin to add subjects to the platform.
+        {% endif %}
+    </p>
+</div>
+{% endif %}
+{% endblock %}

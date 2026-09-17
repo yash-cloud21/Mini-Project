@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% from "macros.html" import render_field %}
+{% block title %}Profile — Student Career Platform{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>Your Profile</h1>
+    <p>Manage your personal and academic information</p>
+</div>
+
+<div class="profile-grid">
+    {# ---- Account Info (read-only) ---- #}
+    <div class="card">
+        <div class="card-header">
+            <h2 class="card-title">Account Information</h2>
+        </div>
+        <div class="info-row">
+            <span class="info-label">Username</span>
+            <span class="info-value">{{ current_user.username }}</span>
+        </div>
+        <div class="info-row">
+            <span class="info-label">Email</span>
+            <span class="info-value">{{ current_user.email }}</span>
+        </div>
+        <div class="info-row">
+            <span class="info-label">Role</span>
+            <span class="info-value">
+                <span class="badge {{ 'badge-danger' if current_user.is_admin else 'badge-primary' }}">
+                    {{ current_user.role }}
+                </span>
+            </span>
+        </div>
+        <div class="info-row">
+            <span class="info-label">Member Since</span>
+            <span class="info-value">{{ current_user.created_at }}</span>
+        </div>
+    </div>
+
+    {# ---- Editable Profile ---- #}
+    <div class="card">
+        <div class="card-header">
+            <h2 class="card-title">Student Profile</h2>
+        </div>
+        <form method="POST" action="{{ url_for('auth.profile') }}" novalidate>
+            {{ form.hidden_tag() }}
+
+            {{ render_field(form.full_name, placeholder='Your full name') }}
+
+            <div class="form-row">
+                {{ render_field(form.enrollment_number, placeholder='e.g. 2024CS001') }}
+                {{ render_field(form.department, placeholder='e.g. Computer Science') }}
+            </div>
+
+            <div class="form-row">
+                {{ render_field(form.semester) }}
+                {{ render_field(form.phone, placeholder='Phone number') }}
+            </div>
+
+            {{ form.submit(class="btn btn-primary") }}
+        </form>
+    </div>
+</div>
+{% endblock %}

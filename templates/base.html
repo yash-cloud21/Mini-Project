@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Student Career Platform{% endblock %}</title>
+    <meta name="description" content="Track academics, practice coding, analyze your resume, and plan your career.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <div class="app-layout">
+        <!-- ==================== Sidebar ==================== -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <h2>🎓 SCP</h2>
+                <span>Student Career Platform</span>
+            </div>
+            <nav class="sidebar-nav">
+                {% set ep = request.endpoint %}
+
+                <a href="{{ url_for('main.dashboard') }}"
+                   class="nav-link {{ 'active' if ep == 'main.dashboard' }}">
+                    <span class="nav-icon">🏠</span> Dashboard
+                </a>
+                <a href="{{ url_for('auth.profile') }}"
+                   class="nav-link {{ 'active' if ep == 'auth.profile' }}">
+                    <span class="nav-icon">👤</span> Profile
+                </a>
+
+                <div class="nav-section-title">Academics</div>
+                <a href="{{ url_for('academics.dashboard') }}"
+                   class="nav-link {{ 'active' if ep == 'academics.dashboard' }}">
+                    <span class="nav-icon">📊</span> Academic Dashboard
+                </a>
+                <a href="{{ url_for('academics.subjects') }}"
+                   class="nav-link {{ 'active' if ep in ('academics.subjects','academics.add_subject') }}">
+                    <span class="nav-icon">📚</span> Subjects
+                </a>
+                <a href="{{ url_for('academics.add_marks') }}"
+                   class="nav-link {{ 'active' if ep == 'academics.add_marks' }}">
+                    <span class="nav-icon">📝</span> Marks
+                </a>
+                <a href="{{ url_for('academics.record_attendance') }}"
+                   class="nav-link {{ 'active' if ep == 'academics.record_attendance' }}">
+                    <span class="nav-icon">📋</span> Attendance
+                </a>
+                <a href="{{ url_for('academics.assignments') }}"
+                   class="nav-link {{ 'active' if ep == 'academics.assignments' }}">
+                    <span class="nav-icon">📌</span> Assignments
+                </a>
+
+                {% if current_user.is_admin %}
+                <div class="nav-section-title">Admin</div>
+                <a href="{{ url_for('academics.subjects') }}"
+                   class="nav-link">
+                    <span class="nav-icon">⚙️</span> Manage Subjects
+                </a>
+                {% endif %}
+            </nav>
+        </aside>
+
+        <!-- ==================== Main ==================== -->
+        <main class="main-content">
+            <header class="top-bar">
+                <button class="sidebar-toggle" id="sidebarToggle" aria-label="Toggle sidebar">☰</button>
+                <div class="top-bar-right">
+                    <span class="user-info">
+                        {{ current_user.username }}
+                        <span class="badge {{ 'badge-danger' if current_user.is_admin else 'badge-primary' }}">
+                            {{ current_user.role }}
+                        </span>
+                    </span>
+                    <a href="{{ url_for('auth.logout') }}" class="btn btn-sm btn-outline">Logout</a>
+                </div>
+            </header>
+
+            {# --- Flash messages --- #}
+            {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+            <div class="flash-messages">
+                {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">
+                    {{ message }}
+                    <button class="alert-close" onclick="this.parentElement.remove()">×</button>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+            {% endwith %}
+
+            <div class="content-wrapper">
+                {% block content %}{% endblock %}
+            </div>
+        </main>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

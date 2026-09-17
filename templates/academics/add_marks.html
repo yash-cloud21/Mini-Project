@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% from "macros.html" import render_field %}
+{% block title %}Marks — Student Career Platform{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>Marks</h1>
+    <p>Record and track your exam scores</p>
+</div>
+
+{# ---- Add Marks Form ---- #}
+<div class="card mb-6">
+    <div class="card-header">
+        <h2 class="card-title">Add Marks Entry</h2>
+    </div>
+    <form method="POST" action="{{ url_for('academics.add_marks') }}" novalidate>
+        {{ form.hidden_tag() }}
+        <div class="form-row">
+            {{ render_field(form.subject_id) }}
+            {{ render_field(form.exam_type) }}
+        </div>
+        <div class="form-row">
+            {{ render_field(form.marks_obtained, placeholder='e.g. 42') }}
+            {{ render_field(form.max_marks, placeholder='e.g. 50') }}
+        </div>
+        {{ form.submit(class="btn btn-primary") }}
+    </form>
+</div>
+
+{# ---- Marks History ---- #}
+{% if marks %}
+<div class="card">
+    <div class="card-header">
+        <h2 class="card-title">Your Marks ({{ marks | length }})</h2>
+    </div>
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Subject</th>
+                    <th>Exam Type</th>
+                    <th>Obtained</th>
+                    <th>Maximum</th>
+                    <th>Percentage</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for m in marks %}
+                <tr>
+                    <td>{{ m.subject_name }} <span class="badge badge-primary">{{ m.subject_code }}</span></td>
+                    <td style="text-transform:capitalize;">{{ m.exam_type }}</td>
+                    <td>{{ m.marks_obtained }}</td>
+                    <td>{{ m.max_marks }}</td>
+                    <td>
+                        {% set pct = (m.marks_obtained / m.max_marks * 100) | round(1) %}
+                        <span class="badge {{ 'badge-success' if pct >= 60 else ('badge-warning' if pct >= 40 else 'badge-danger') }}">
+                            {{ pct }}%
+                        </span>
+                    </td>
+                    <td>
+                        <form method="POST" action="{{ url_for('academics.delete_mark', mark_id=m.id) }}"
+                              style="display:inline;"
+                              onsubmit="return confirm('Delete this marks entry?');">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% else %}
+<div class="empty-state">
+    <div class="empty-state-icon">📝</div>
+    <h3>No Marks Recorded</h3>
+    <p>Use the form above to record your first exam result.</p>
+</div>
+{% endif %}
+{% endblock %}

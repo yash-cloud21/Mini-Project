@@ -1,0 +1,28 @@
+{% extends "base_public.html" %}
+{% from "macros.html" import render_field %}
+{% block title %}Register — Student Career Platform{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="auth-card">
+        <h1>Create Account</h1>
+        <p>Join the platform to start tracking your career progress</p>
+
+        <form method="POST" action="{{ url_for('auth.register') }}" novalidate>
+            {{ form.hidden_tag() }}
+
+            {{ render_field(form.username, placeholder='Choose a username') }}
+            {{ render_field(form.email, placeholder='you@example.com') }}
+            {{ render_field(form.password, placeholder='At least 6 characters') }}
+            {{ render_field(form.confirm_password, placeholder='Re-enter your password') }}
+
+            {{ form.submit(class="btn btn-primary btn-block") }}
+        </form>
+
+        <p class="auth-footer">
+            Already have an account?
+            <a href="{{ url_for('auth.login') }}">Login here</a>
+        </p>
+    </div>
+</div>
+{% endblock %}

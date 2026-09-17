@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Student Career Platform{% endblock %}</title>
+    <meta name="description" content="Track academics, practice coding, analyze your resume, and plan your career.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <div class="auth-layout">
+        <!-- Top navigation for public pages -->
+        <nav class="auth-nav">
+            <a href="{{ url_for('main.home') }}" class="auth-brand">🎓 Student Career Platform</a>
+            <div class="auth-nav-links">
+                <a href="{{ url_for('auth.login') }}" class="btn btn-ghost">Login</a>
+                <a href="{{ url_for('auth.register') }}" class="btn btn-white">Register</a>
+            </div>
+        </nav>
+
+        {# --- Flash messages --- #}
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <div class="flash-messages" style="max-width: 500px; margin: 0 auto; padding: 0 1rem;">
+            {% for category, message in messages %}
+            <div class="alert alert-{{ category }}">
+                {{ message }}
+                <button class="alert-close" onclick="this.parentElement.remove()">×</button>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+    </div>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>
