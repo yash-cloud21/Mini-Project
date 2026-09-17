@@ -1,0 +1,205 @@
+{% extends "base.html" %}
+{% block title %}Academic Dashboard — Student Career Platform{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>Academic Dashboard</h1>
+    <p>Track your academic performance across all subjects</p>
+</div>
+
+{% if summary.total_subjects > 0 %}
+{# ==================== Summary Cards ==================== #}
+<div class="summary-grid">
+    <div class="summary-card primary">
+        <div class="summary-label">Overall Marks</div>
+        <div class="summary-value">{{ summary.overall_marks }}%</div>
+        <div class="summary-detail">Across all subjects &amp; exams</div>
+    </div>
+    <div class="summary-card success">
+        <div class="summary-label">Attendance</div>
+        <div class="summary-value">{{ summary.overall_attendance }}%</div>
+        <div class="summary-detail">Classes attended (incl. late)</div>
+    </div>
+    <div class="summary-card warning">
+        <div class="summary-label">Assignment Completion</div>
+        <div class="summary-value">{{ summary.overall_assignments }}%</div>
+        <div class="summary-detail">Assignments completed</div>
+    </div>
+    <div class="summary-card info">
+        <div class="summary-label">Overall Score</div>
+        <div class="summary-value">{{ summary.overall_score }}%</div>
+        <div class="summary-detail">Weighted academic score</div>
+    </div>
+</div>
+
+{# ==================== Formula Explanation ==================== #}
+<div class="formula-card">
+    <h4>📐 How is the Overall Score calculated?</h4>
+    <p>
+        <code>Overall Score = (Marks × {{ summary.weights.marks }}) + (Attendance × {{ summary.weights.attendance }}) + (Assignments × {{ summary.weights.assignments }})</code>
+    </p>
+    <p class="formula-detail">
+        = ({{ summary.overall_marks }}% × {{ summary.weights.marks }})
+        + ({{ summary.overall_attendance }}% × {{ summary.weights.attendance }})
+        + ({{ summary.overall_assignments }}% × {{ summary.weights.assignments }})
+        = <strong>{{ summary.overall_score }}%</strong>
+    </p>
+</div>
+
+{# ==================== Subject-wise Table ==================== #}
+<div class="card mt-6">
+    <div class="card-header">
+        <h2 class="card-title">Subject-wise Performance</h2>
+    </div>
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Subject</th>
+                    <th>Code</th>
+                    <th>Credits</th>
+                    <th>Marks %</th>
+                    <th>Attendance %</th>
+                    <th>Assignment %</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for s in summary.subjects %}
+                <tr>
+                    <td><strong>{{ s.name }}</strong></td>
+                    <td><span class="badge badge-primary">{{ s.code }}</span></td>
+                    <td>{{ s.credits }}</td>
+                    <td>
+                        <div class="metric-cell">
+                            <div class="progress-bar" style="width:100px;">
+                                <div class="progress-fill {{ 'success' if s.marks_percentage >= 60 else ('warning' if s.marks_percentage >= 40 else 'danger') }}"
+                                     style="width:{{ s.marks_percentage }}%;"></div>
+                            </div>
+                            <span>{{ s.marks_percentage }}%</span>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="metric-cell">
+                            <div class="progress-bar" style="width:100px;">
+                                <div class="progress-fill {{ 'success' if s.attendance_percentage >= 75 else ('warning' if s.attendance_percentage >= 60 else 'danger') }}"
+                                     style="width:{{ s.attendance_percentage }}%;"></div>
+                            </div>
+                            <span>{{ s.attendance_percentage }}%</span>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="metric-cell">
+                            <div class="progress-bar" style="width:100px;">
+                                <div class="progress-fill {{ 'success' if s.assignment_completion >= 75 else ('warning' if s.assignment_completion >= 50 else 'danger') }}"
+                                     style="width:{{ s.assignment_completion }}%;"></div>
+                            </div>
+                            <span>{{ s.assignment_completion }}%</span>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{# ==================== Charts ==================== #}
+<div class="chart-grid">
+    <div class="chart-container">
+        <h3 class="card-title" style="margin-bottom:1rem;">Marks by Subject</h3>
+        <canvas id="marksChart"></canvas>
+    </div>
+    <div class="chart-container">
+        <h3 class="card-title" style="margin-bottom:1rem;">Performance Overview</h3>
+        <canvas id="overviewChart"></canvas>
+    </div>
+</div>
+
+{% else %}
+{# ==================== Empty State ==================== #}
+<div class="empty-state">
+    <div class="empty-state-icon">📊</div>
+    <h3>No Academic Data Yet</h3>
+    <p>Start by adding subjects, then record marks, attendance, and assignments to see your dashboard.</p>
+    <div class="empty-state-actions">
+        <a href="{{ url_for('academics.subjects') }}" class="btn btn-primary">View Subjects</a>
+        <a href="{{ url_for('academics.add_marks') }}" class="btn btn-outline">Add Marks</a>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
+
+{# ==================== Chart.js ==================== #}
+{% block extra_js %}
+{% if summary.total_subjects > 0 %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+<script>
+const subjects = {{ summary.subjects | tojson }};
+const colors = {
+    primary:  'rgba(99, 102, 241, 0.75)',
+    success:  'rgba(16, 185, 129, 0.75)',
+    warning:  'rgba(245, 158, 11, 0.75)',
+    primaryB: 'rgba(99, 102, 241, 1)',
+    successB: 'rgba(16, 185, 129, 1)',
+    warningB: 'rgba(245, 158, 11, 1)',
+};
+
+/* ---- Bar chart: marks by subject ---- */
+new Chart(document.getElementById('marksChart'), {
+    type: 'bar',
+    data: {
+        labels: subjects.map(s => s.code),
+        datasets: [{
+            label: 'Marks %',
+            data: subjects.map(s => s.marks_percentage),
+            backgroundColor: colors.primary,
+            borderColor: colors.primaryB,
+            borderWidth: 1,
+            borderRadius: 6,
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: { legend: { display: false } },
+        scales: {
+            y: { beginAtZero: true, max: 100, ticks: { callback: v => v + '%' } },
+        },
+    },
+});
+
+/* ---- Radar chart: multi-metric overview ---- */
+new Chart(document.getElementById('overviewChart'), {
+    type: 'radar',
+    data: {
+        labels: subjects.map(s => s.code),
+        datasets: [
+            {
+                label: 'Marks %',
+                data: subjects.map(s => s.marks_percentage),
+                borderColor: colors.primaryB,
+                backgroundColor: 'rgba(99, 102, 241, 0.15)',
+            },
+            {
+                label: 'Attendance %',
+                data: subjects.map(s => s.attendance_percentage),
+                borderColor: colors.successB,
+                backgroundColor: 'rgba(16, 185, 129, 0.15)',
+            },
+            {
+                label: 'Assignment %',
+                data: subjects.map(s => s.assignment_completion),
+                borderColor: colors.warningB,
+                backgroundColor: 'rgba(245, 158, 11, 0.15)',
+            },
+        ]
+    },
+    options: {
+        responsive: true,
+        scales: {
+            r: { beginAtZero: true, max: 100, ticks: { stepSize: 20 } },
+        },
+    },
+});
+</script>
+{% endif %}
+{% endblock %}

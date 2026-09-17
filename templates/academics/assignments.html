@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+{% from "macros.html" import render_field %}
+{% block title %}Assignments — Student Career Platform{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>Assignments</h1>
+    <p>Track and manage your assignments</p>
+</div>
+
+{# ---- Add Assignment Form ---- #}
+<div class="card mb-6">
+    <div class="card-header">
+        <h2 class="card-title">Add Assignment</h2>
+    </div>
+    <form method="POST" action="{{ url_for('academics.assignments') }}" novalidate>
+        {{ form.hidden_tag() }}
+        <div class="form-row">
+            {{ render_field(form.subject_id) }}
+            {{ render_field(form.title, placeholder='Assignment title') }}
+        </div>
+        <div class="form-row">
+            {{ render_field(form.due_date) }}
+        </div>
+        {{ render_field(form.description, placeholder='Description (optional)') }}
+        {{ form.submit(class="btn btn-primary") }}
+    </form>
+</div>
+
+{# ---- Assignments List ---- #}
+{% if assignments %}
+<div class="card">
+    <div class="card-header">
+        <h2 class="card-title">Your Assignments ({{ assignments | length }})</h2>
+    </div>
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Subject</th>
+                    <th>Due Date</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for a in assignments %}
+                <tr>
+                    <td>
+                        <strong>{{ a.title }}</strong>
+                        {% if a.description %}
+                            <div class="text-muted" style="font-size:0.8rem; margin-top:2px;">{{ a.description[:80] }}{% if a.description|length > 80 %}…{% endif %}</div>
+                        {% endif %}
+                    </td>
+                    <td>{{ a.subject_name }} <span class="badge badge-primary">{{ a.subject_code }}</span></td>
+                    <td>{{ a.due_date or '—' }}</td>
+                    <td>
+                        {% if a.status == 'completed' %}
+                            <span class="badge badge-success">Completed</span>
+                        {% elif a.status == 'overdue' %}
+                            <span class="badge badge-danger">Overdue</span>
+                        {% else %}
+                            <span class="badge badge-warning">Pending</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <div style="display:flex; gap:0.5rem;">
+                            {% if a.status != 'completed' %}
+                            <form method="POST" action="{{ url_for('academics.complete_assignment', assignment_id=a.id) }}">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <button type="submit" class="btn btn-sm btn-success">✓ Done</button>
+                            </form>
+                            {% endif %}
+                            <form method="POST" action="{{ url_for('academics.delete_assignment', assignment_id=a.id) }}"
+                                  onsubmit="return confirm('Delete this assignment?');">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% else %}
+<div class="empty-state">
+    <div class="empty-state-icon">📌</div>
+    <h3>No Assignments Yet</h3>
+    <p>Use the form above to add your first assignment.</p>
+</div>
+{% endif %}
+{% endblock %}
