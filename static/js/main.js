@@ -40,4 +40,36 @@ document.addEventListener('DOMContentLoaded', function () {
             setTimeout(function () { alert.remove(); }, 300);
         }, 5000);
     });
+
+    // ----------------------------------------------------------------
+    // Dark/Light Theme Toggle
+    // ----------------------------------------------------------------
+    const themeToggle = document.getElementById('themeToggle');
+    const themeIcon = document.getElementById('themeIcon');
+    
+    function updateIcon() {
+        if (!themeIcon) return;
+        if (document.documentElement.getAttribute('data-theme') === 'dark') {
+            themeIcon.setAttribute('data-lucide', 'sun');
+        } else {
+            themeIcon.setAttribute('data-lucide', 'moon');
+        }
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
+        }
+    }
+
+    if (themeToggle) {
+        updateIcon();
+        themeToggle.addEventListener('click', function() {
+            if (document.documentElement.getAttribute('data-theme') === 'dark') {
+                document.documentElement.removeAttribute('data-theme');
+                localStorage.setItem('theme', 'light');
+            } else {
+                document.documentElement.setAttribute('data-theme', 'dark');
+                localStorage.setItem('theme', 'dark');
+            }
+            updateIcon();
+        });
+    }
 });
