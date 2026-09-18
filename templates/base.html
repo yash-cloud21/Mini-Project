@@ -30,43 +30,43 @@
 
                 <a href="{{ url_for('main.dashboard') }}"
                    class="nav-link {{ 'active' if ep == 'main.dashboard' }}">
-                    <i data-lucide="layout-dashboard" class="nav-icon"></i> Dashboard
+                    <i data-lucide="layout-dashboard" class="nav-icon icon-blue"></i> Dashboard
                 </a>
                 <a href="{{ url_for('auth.profile') }}"
                    class="nav-link {{ 'active' if ep == 'auth.profile' }}">
-                    <i data-lucide="user" class="nav-icon"></i> Profile
+                    <i data-lucide="user" class="nav-icon icon-rose"></i> Profile
                 </a>
 
                 <div class="nav-section-title">Academics</div>
                 <a href="{{ url_for('academics.dashboard') }}"
                    class="nav-link {{ 'active' if ep == 'academics.dashboard' }}">
-                    <i data-lucide="bar-chart-2" class="nav-icon"></i> Academic Dashboard
+                    <i data-lucide="bar-chart-2" class="nav-icon icon-blue"></i> Academic Dashboard
                 </a>
                 <a href="{{ url_for('academics.subjects') }}"
                    class="nav-link {{ 'active' if ep in ('academics.subjects','academics.add_subject') }}">
-                    <i data-lucide="book-open" class="nav-icon"></i> Subjects
+                    <i data-lucide="book-open" class="nav-icon icon-teal"></i> Subjects
                 </a>
                 <a href="{{ url_for('academics.add_marks') }}"
                    class="nav-link {{ 'active' if ep == 'academics.add_marks' }}">
-                    <i data-lucide="file-text" class="nav-icon"></i> Marks
+                    <i data-lucide="file-text" class="nav-icon icon-green"></i> Marks
                 </a>
                 <a href="{{ url_for('academics.record_attendance') }}"
                    class="nav-link {{ 'active' if ep == 'academics.record_attendance' }}">
-                    <i data-lucide="clipboard-check" class="nav-icon"></i> Attendance
+                    <i data-lucide="clipboard-check" class="nav-icon icon-yellow"></i> Attendance
                 </a>
                 <a href="{{ url_for('academics.assignments') }}"
                    class="nav-link {{ 'active' if ep == 'academics.assignments' }}">
-                    <i data-lucide="paperclip" class="nav-icon"></i> Assignments
+                    <i data-lucide="paperclip" class="nav-icon icon-purple"></i> Assignments
                 </a>
 
                 <div class="nav-section-title">Coding</div>
                 <a href="{{ url_for('coding.dashboard') }}"
                    class="nav-link {{ 'active' if ep == 'coding.dashboard' }}">
-                    <i data-lucide="terminal" class="nav-icon"></i> Coding Dashboard
+                    <i data-lucide="terminal" class="nav-icon icon-orange"></i> Coding Dashboard
                 </a>
                 <a href="{{ url_for('coding.problems') }}"
                    class="nav-link {{ 'active' if ep in ('coding.problems','coding.problem_detail') }}">
-                    <i data-lucide="code" class="nav-icon"></i> Problems
+                    <i data-lucide="code" class="nav-icon icon-indigo"></i> Problems
                 </a>
 
                 {% if current_user.is_admin %}

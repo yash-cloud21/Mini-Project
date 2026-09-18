@@ -81,11 +81,28 @@
 
     --border: #404040;
     
+    /* Override sidebar to match the full dark theme */
+    --sidebar-bg:          #1a1a1a;
+    --sidebar-hover:       #262626;
+    --sidebar-active:      #333333;
+    --sidebar-text:        #9ca3af;
+    --sidebar-text-bright: #eff2f6;
+    
     --shadow-sm: 0 1px 2px rgba(0,0,0,.3);
     --shadow:    0 1px 3px rgba(0,0,0,.4), 0 1px 2px rgba(0,0,0,.24);
     --shadow-md: 0 4px 6px -1px rgba(0,0,0,.4), 0 2px 4px -1px rgba(0,0,0,.24);
     --shadow-lg: 0 10px 15px -3px rgba(0,0,0,.5), 0 4px 6px -2px rgba(0,0,0,.3);
 }
+
+/* Icon Colors (LeetCode style) */
+.icon-orange { color: #f59e0b; }
+.icon-blue   { color: #3b82f6; }
+.icon-green  { color: #10b981; }
+.icon-purple { color: #a855f7; }
+.icon-rose   { color: #f43f5e; }
+.icon-teal   { color: #14b8a6; }
+.icon-indigo { color: #6366f1; }
+.icon-yellow { color: #eab308; }
 
 html { scroll-behavior: smooth; }
 
