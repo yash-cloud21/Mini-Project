@@ -16,7 +16,7 @@
         <!-- ==================== Sidebar ==================== -->
         <aside class="sidebar" id="sidebar">
             <div class="sidebar-header">
-                <h2>🎓 SCP</h2>
+                <h2 style="display: flex; align-items: center; gap: 6px;"><i data-lucide="graduation-cap"></i> SCP</h2>
                 <span>Student Career Platform</span>
             </div>
             <nav class="sidebar-nav">
@@ -24,54 +24,54 @@
 
                 <a href="{{ url_for('main.dashboard') }}"
                    class="nav-link {{ 'active' if ep == 'main.dashboard' }}">
-                    <span class="nav-icon">🏠</span> Dashboard
+                    <i data-lucide="layout-dashboard" class="nav-icon"></i> Dashboard
                 </a>
                 <a href="{{ url_for('auth.profile') }}"
                    class="nav-link {{ 'active' if ep == 'auth.profile' }}">
-                    <span class="nav-icon">👤</span> Profile
+                    <i data-lucide="user" class="nav-icon"></i> Profile
                 </a>
 
                 <div class="nav-section-title">Academics</div>
                 <a href="{{ url_for('academics.dashboard') }}"
                    class="nav-link {{ 'active' if ep == 'academics.dashboard' }}">
-                    <span class="nav-icon">📊</span> Academic Dashboard
+                    <i data-lucide="bar-chart-2" class="nav-icon"></i> Academic Dashboard
                 </a>
                 <a href="{{ url_for('academics.subjects') }}"
                    class="nav-link {{ 'active' if ep in ('academics.subjects','academics.add_subject') }}">
-                    <span class="nav-icon">📚</span> Subjects
+                    <i data-lucide="book-open" class="nav-icon"></i> Subjects
                 </a>
                 <a href="{{ url_for('academics.add_marks') }}"
                    class="nav-link {{ 'active' if ep == 'academics.add_marks' }}">
-                    <span class="nav-icon">📝</span> Marks
+                    <i data-lucide="file-text" class="nav-icon"></i> Marks
                 </a>
                 <a href="{{ url_for('academics.record_attendance') }}"
                    class="nav-link {{ 'active' if ep == 'academics.record_attendance' }}">
-                    <span class="nav-icon">📋</span> Attendance
+                    <i data-lucide="clipboard-check" class="nav-icon"></i> Attendance
                 </a>
                 <a href="{{ url_for('academics.assignments') }}"
                    class="nav-link {{ 'active' if ep == 'academics.assignments' }}">
-                    <span class="nav-icon">📌</span> Assignments
+                    <i data-lucide="paperclip" class="nav-icon"></i> Assignments
                 </a>
 
                 <div class="nav-section-title">Coding</div>
                 <a href="{{ url_for('coding.dashboard') }}"
                    class="nav-link {{ 'active' if ep == 'coding.dashboard' }}">
-                    <span class="nav-icon">💻</span> Coding Dashboard
+                    <i data-lucide="terminal" class="nav-icon"></i> Coding Dashboard
                 </a>
                 <a href="{{ url_for('coding.problems') }}"
                    class="nav-link {{ 'active' if ep in ('coding.problems','coding.problem_detail') }}">
-                    <span class="nav-icon">🧩</span> Problems
+                    <i data-lucide="code" class="nav-icon"></i> Problems
                 </a>
 
                 {% if current_user.is_admin %}
                 <div class="nav-section-title">Admin</div>
                 <a href="{{ url_for('academics.subjects') }}"
                    class="nav-link">
-                    <span class="nav-icon">⚙️</span> Manage Subjects
+                    <i data-lucide="settings" class="nav-icon"></i> Manage Subjects
                 </a>
                 <a href="{{ url_for('coding.admin_problems') }}"
                    class="nav-link {{ 'active' if ep == 'coding.admin_problems' }}">
-                    <span class="nav-icon">📦</span> Manage Problems
+                    <i data-lucide="package" class="nav-icon"></i> Manage Problems
                 </a>
                 {% endif %}
             </nav>
@@ -80,7 +80,7 @@
         <!-- ==================== Main ==================== -->
         <main class="main-content">
             <header class="top-bar">
-                <button class="sidebar-toggle" id="sidebarToggle" aria-label="Toggle sidebar">☰</button>
+                <button class="sidebar-toggle" id="sidebarToggle" aria-label="Toggle sidebar"><i data-lucide="menu"></i></button>
                 <div class="top-bar-right">
                     <span class="user-info">
                         {{ current_user.username }}
@@ -113,6 +113,12 @@
     </div>
 
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", function(event) { 
+          lucide.createIcons();
+      });
+    </script>
     {% block extra_js %}{% endblock %}
 </body>
 </html>
