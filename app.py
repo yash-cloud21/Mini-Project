@@ -39,6 +39,9 @@ def create_app(config_class=Config):
     def load_user(user_id):
         return User.get_by_id(int(user_id))
 
+    # Load SECRET_KEY from environment variables for deployment, fallback to default for local
+    app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-secret-key-change-in-prod')
+
     # --- Database ---
     init_db_app(app)
 
