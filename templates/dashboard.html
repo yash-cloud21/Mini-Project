@@ -66,5 +66,15 @@
         <h3>Subjects</h3>
         <p>Browse available subjects</p>
     </a>
+    <a href="{{ url_for('coding.dashboard') }}" class="action-card">
+        <span class="action-icon">💻</span>
+        <h3>Coding Dashboard</h3>
+        <p>Track your coding progress</p>
+    </a>
+    <a href="{{ url_for('coding.problems') }}" class="action-card">
+        <span class="action-icon">🧩</span>
+        <h3>Practice Problems</h3>
+        <p>Solve coding challenges</p>
+    </a>
 </div>
 {% endblock %}

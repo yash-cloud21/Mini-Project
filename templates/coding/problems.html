@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+{% block title %}Practice Problems — Student Career Platform{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>Practice Problems</h1>
+    <p>{{ total }} problems available — filter by topic, difficulty, or status</p>
+</div>
+
+{# ==================== Filters ==================== #}
+<div class="card mb-6">
+    <form method="GET" action="{{ url_for('coding.problems') }}" class="filter-bar">
+        <div class="filter-group">
+            <label class="form-label">Topic</label>
+            {{ filter_form.topic(class="form-control") }}
+        </div>
+        <div class="filter-group">
+            <label class="form-label">Difficulty</label>
+            {{ filter_form.difficulty(class="form-control") }}
+        </div>
+        <div class="filter-group">
+            <label class="form-label">Status</label>
+            {{ filter_form.status(class="form-control") }}
+        </div>
+        <div class="filter-group" style="align-self:flex-end;">
+            <button type="submit" class="btn btn-primary">Filter</button>
+            <a href="{{ url_for('coding.problems') }}" class="btn btn-outline">Clear</a>
+        </div>
+    </form>
+</div>
+
+{# ==================== Problems List ==================== #}
+{% if problems %}
+<div class="card">
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th style="width:40px;">#</th>
+                    <th>Title</th>
+                    <th>Topic</th>
+                    <th>Difficulty</th>
+                    <th>Status</th>
+                    <th style="width:80px;">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for p in problems %}
+                <tr>
+                    <td class="text-muted">{{ p.id }}</td>
+                    <td>
+                        <a href="{{ url_for('coding.problem_detail', problem_id=p.id) }}" class="problem-link">
+                            {{ p.title }}
+                        </a>
+                    </td>
+                    <td><span class="badge badge-primary" style="text-transform:capitalize;">{{ p.topic }}</span></td>
+                    <td>
+                        <span class="badge {{ 'badge-success' if p.difficulty == 'easy' else ('badge-warning' if p.difficulty == 'medium' else 'badge-danger') }}">
+                            {{ p.difficulty }}
+                        </span>
+                    </td>
+                    <td>
+                        {% if p.status == 'solved' %}
+                            <span class="status-dot solved"></span> Solved
+                        {% elif p.status == 'attempted' %}
+                            <span class="status-dot attempted"></span> Attempted
+                        {% else %}
+                            <span class="status-dot unsolved"></span> —
+                        {% endif %}
+                    </td>
+                    <td>
+                        <a href="{{ url_for('coding.problem_detail', problem_id=p.id) }}" class="btn btn-sm btn-primary">Solve</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% else %}
+<div class="empty-state">
+    <div class="empty-state-icon">🧩</div>
+    <h3>No Problems Found</h3>
+    <p>Try adjusting your filters or check back later.</p>
+    <a href="{{ url_for('coding.problems') }}" class="btn btn-primary">Clear Filters</a>
+</div>
+{% endif %}
+{% endblock %}

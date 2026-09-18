@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+{% block title %}Submission Result — Student Career Platform{% endblock %}
+
+{% block content %}
+<div class="flex-between mb-6">
+    <div>
+        <a href="{{ url_for('coding.problem_detail', problem_id=problem_id) }}" class="btn btn-sm btn-outline">&larr; Back to Problem</a>
+        <h1 style="font-size:1.5rem; font-weight:700; margin-top:.5rem;">Submission Result</h1>
+        <p class="text-muted">{{ submission.problem_title }}</p>
+    </div>
+</div>
+
+{# ==================== Result Summary ==================== #}
+<div class="card mb-6">
+    <div class="result-header">
+        {% if submission.result == 'accepted' %}
+            <div class="result-banner result-accepted">
+                <span class="result-icon">&#10003;</span>
+                <div>
+                    <h2>Accepted</h2>
+                    <p>All {{ submission.tests_total }} test cases passed!</p>
+                </div>
+            </div>
+        {% elif submission.result == 'timeout' %}
+            <div class="result-banner result-timeout">
+                <span class="result-icon">&#9201;</span>
+                <div>
+                    <h2>Time Limit Exceeded</h2>
+                    <p>Your code took too long to execute. Try optimizing.</p>
+                </div>
+            </div>
+        {% elif submission.result == 'error' %}
+            <div class="result-banner result-error">
+                <span class="result-icon">&#10060;</span>
+                <div>
+                    <h2>Runtime Error</h2>
+                    <p>Your code encountered an error during execution.</p>
+                </div>
+            </div>
+        {% else %}
+            <div class="result-banner result-wrong">
+                <span class="result-icon">&#10007;</span>
+                <div>
+                    <h2>Wrong Answer</h2>
+                    <p>Passed {{ submission.tests_passed }} of {{ submission.tests_total }} test cases.</p>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+
+    <div style="display:flex; gap:2rem; margin-top:1rem; font-size:.875rem;">
+        <div>
+            <span class="text-muted">Tests Passed:</span>
+            <strong>{{ submission.tests_passed }} / {{ submission.tests_total }}</strong>
+        </div>
+        <div>
+            <span class="text-muted">Language:</span>
+            <strong>{{ submission.language }}</strong>
+        </div>
+        <div>
+            <span class="text-muted">Submitted:</span>
+            <strong>{{ submission.submitted_at }}</strong>
+        </div>
+    </div>
+</div>
+
+{# ==================== Test Case Details ==================== #}
+{% if result_detail %}
+<div class="card mb-6">
+    <div class="card-header">
+        <h2 class="card-title">Test Case Results</h2>
+    </div>
+    {% for r in result_detail %}
+    <div class="test-result-row {{ 'test-pass' if r.status == 'pass' else 'test-fail' }}">
+        <div class="test-result-header">
+            <span>
+                {% if r.status == 'pass' %}
+                    <span class="badge badge-success">PASS</span>
+                {% elif r.status == 'timeout' %}
+                    <span class="badge badge-warning">TIMEOUT</span>
+                {% elif r.status == 'error' %}
+                    <span class="badge badge-danger">ERROR</span>
+                {% else %}
+                    <span class="badge badge-danger">FAIL</span>
+                {% endif %}
+                Test Case {{ loop.index }}
+                {% if r.is_sample %}<span class="text-muted" style="font-size:.75rem;">(sample)</span>{% endif %}
+            </span>
+        </div>
+        {% if r.status != 'pass' %}
+        <div class="test-result-detail">
+            {% if r.expected_output %}
+            <div class="test-data">
+                <span class="sample-label">Expected Output</span>
+                <pre>{{ r.expected_output }}</pre>
+            </div>
+            {% endif %}
+            {% if r.actual_output %}
+            <div class="test-data">
+                <span class="sample-label">Your Output</span>
+                <pre>{{ r.actual_output }}</pre>
+            </div>
+            {% endif %}
+            {% if r.error_message %}
+            <div class="test-data">
+                <span class="sample-label" style="color:var(--danger);">Error</span>
+                <pre style="color:var(--danger);">{{ r.error_message }}</pre>
+            </div>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+{# ==================== Submitted Code ==================== #}
+<div class="card">
+    <div class="card-header">
+        <h2 class="card-title">Submitted Code</h2>
+    </div>
+    <pre class="code-display">{{ submission.code }}</pre>
+</div>
+{% endblock %}

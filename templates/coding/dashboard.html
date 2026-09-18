@@ -1,0 +1,183 @@
+{% extends "base.html" %}
+{% block title %}Coding Dashboard — Student Career Platform{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>Coding Dashboard</h1>
+    <p>Track your coding practice progress across topics and difficulty levels</p>
+</div>
+
+{# ==================== Summary Cards ==================== #}
+<div class="summary-grid">
+    <div class="summary-card primary">
+        <div class="summary-label">Problems Solved</div>
+        <div class="summary-value">{{ summary.solved }}</div>
+        <div class="summary-detail">out of {{ summary.total }} total</div>
+    </div>
+    <div class="summary-card success">
+        <div class="summary-label">Solve Rate</div>
+        <div class="summary-value">{{ summary.solve_rate }}%</div>
+        <div class="summary-detail">{{ summary.solved }} solved / {{ summary.total }} total</div>
+    </div>
+    <div class="summary-card warning">
+        <div class="summary-label">Attempted</div>
+        <div class="summary-value">{{ summary.attempted }}</div>
+        <div class="summary-detail">{{ summary.attempted - summary.solved }} still unsolved</div>
+    </div>
+    <div class="summary-card info">
+        <div class="summary-label">Remaining</div>
+        <div class="summary-value">{{ summary.remaining }}</div>
+        <div class="summary-detail">problems not yet tried</div>
+    </div>
+</div>
+
+{# ==================== Progress Charts ==================== #}
+<div class="chart-grid">
+    <div class="chart-container">
+        <h3 class="card-title" style="margin-bottom:1rem;">Topic-wise Progress</h3>
+        <canvas id="topicChart"></canvas>
+    </div>
+    <div class="chart-container">
+        <h3 class="card-title" style="margin-bottom:1rem;">Difficulty Breakdown</h3>
+        <canvas id="difficultyChart"></canvas>
+    </div>
+</div>
+
+{# ==================== Topic Table ==================== #}
+<div class="card mt-6">
+    <div class="card-header">
+        <h2 class="card-title">Topic-wise Breakdown</h2>
+        <a href="{{ url_for('coding.problems') }}" class="btn btn-sm btn-primary">Browse Problems</a>
+    </div>
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Topic</th>
+                    <th>Solved</th>
+                    <th>Total</th>
+                    <th>Progress</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for t in summary.topics %}
+                <tr>
+                    <td><strong style="text-transform:capitalize;">{{ t.topic }}</strong></td>
+                    <td>{{ t.solved }}</td>
+                    <td>{{ t.total }}</td>
+                    <td>
+                        <div class="metric-cell">
+                            <div class="progress-bar" style="width:120px;">
+                                {% set pct = (t.solved / t.total * 100) | round(0) | int if t.total > 0 else 0 %}
+                                <div class="progress-fill {{ 'success' if pct == 100 else ('primary' if pct > 0 else 'danger') }}"
+                                     style="width:{{ pct }}%;"></div>
+                            </div>
+                            <span>{{ pct }}%</span>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{# ==================== Recent Submissions ==================== #}
+{% if summary.recent %}
+<div class="card mt-6">
+    <div class="card-header">
+        <h2 class="card-title">Recent Submissions</h2>
+    </div>
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Problem</th>
+                    <th>Difficulty</th>
+                    <th>Result</th>
+                    <th>Tests</th>
+                    <th>Submitted</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for s in summary.recent %}
+                <tr>
+                    <td><a href="{{ url_for('coding.problem_detail', problem_id=s.problem_id) }}">{{ s.problem_title }}</a></td>
+                    <td>
+                        <span class="badge {{ 'badge-success' if s.difficulty == 'easy' else ('badge-warning' if s.difficulty == 'medium' else 'badge-danger') }}">
+                            {{ s.difficulty }}
+                        </span>
+                    </td>
+                    <td>
+                        <span class="badge {{ 'badge-success' if s.result == 'accepted' else ('badge-warning' if s.result == 'timeout' else 'badge-danger') }}">
+                            {{ s.result | replace('_', ' ') }}
+                        </span>
+                    </td>
+                    <td>{{ s.tests_passed }}/{{ s.tests_total }}</td>
+                    <td class="text-muted">{{ s.submitted_at }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+<script>
+const topicData = {{ summary.topics | tojson }};
+const diffData = {{ summary.difficulties | tojson }};
+
+/* Topic-wise bar chart */
+new Chart(document.getElementById('topicChart'), {
+    type: 'bar',
+    data: {
+        labels: topicData.map(t => t.topic.charAt(0).toUpperCase() + t.topic.slice(1)),
+        datasets: [
+            {
+                label: 'Solved',
+                data: topicData.map(t => t.solved),
+                backgroundColor: 'rgba(16, 185, 129, 0.75)',
+                borderRadius: 4,
+            },
+            {
+                label: 'Total',
+                data: topicData.map(t => t.total),
+                backgroundColor: 'rgba(99, 102, 241, 0.25)',
+                borderRadius: 4,
+            }
+        ]
+    },
+    options: {
+        responsive: true,
+        plugins: { legend: { position: 'top' } },
+        scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } },
+    },
+});
+
+/* Difficulty doughnut */
+const diffColors = { easy: '#10b981', medium: '#f59e0b', hard: '#ef4444' };
+new Chart(document.getElementById('difficultyChart'), {
+    type: 'doughnut',
+    data: {
+        labels: diffData.map(d => d.difficulty.charAt(0).toUpperCase() + d.difficulty.slice(1)),
+        datasets: [{
+            label: 'Solved',
+            data: diffData.map(d => d.solved),
+            backgroundColor: diffData.map(d => diffColors[d.difficulty] || '#6366f1'),
+            borderWidth: 2,
+            borderColor: '#fff',
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            legend: { position: 'bottom' },
+            title: { display: true, text: 'Solved by Difficulty' },
+        },
+    },
+});
+</script>
+{% endblock %}

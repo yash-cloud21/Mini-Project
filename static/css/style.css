@@ -814,3 +814,108 @@ tr:hover td { background: var(--surface-alt); }
     .summary-grid { grid-template-columns: 1fr; }
     .action-grid  { grid-template-columns: 1fr; }
 }
+
+
+/* ============================================================
+   CODING MODULE — Week 2
+   ============================================================ */
+
+/* ---- Filter Bar ---- */
+
+.filter-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    align-items: flex-end;
+}
+.filter-group { min-width: 160px; }
+.filter-group .form-control { min-width: 140px; }
+
+/* ---- Status Dots (solved / attempted / unsolved) ---- */
+
+.status-dot {
+    display: inline-block;
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    margin-right: .35rem;
+}
+.status-dot.solved    { background: var(--success); }
+.status-dot.attempted { background: var(--warning); }
+.status-dot.unsolved  { background: var(--border); }
+
+/* ---- Problem Link ---- */
+
+.problem-link {
+    font-weight: 500;
+    text-decoration: none;
+    color: var(--text);
+    transition: var(--transition);
+}
+.problem-link:hover { color: var(--primary); }
+
+/* ---- Code Display ---- */
+
+.code-display {
+    background: #1e1e2e;
+    color: #cdd6f4;
+    font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+    font-size: .82rem;
+    padding: 1rem;
+    border-radius: var(--radius);
+    overflow-x: auto;
+    white-space: pre-wrap;
+    line-height: 1.5;
+}
+
+/* ---- Result Banners ---- */
+
+.result-banner {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.25rem;
+    border-radius: var(--radius);
+    border-left: 5px solid;
+}
+.result-banner h2 { font-size: 1.25rem; font-weight: 700; margin-bottom: .15rem; }
+.result-banner p  { font-size: .85rem; opacity: .85; }
+.result-icon { font-size: 2rem; }
+
+.result-accepted { background: var(--success-bg); border-color: var(--success); color: #065f46; }
+.result-wrong    { background: var(--danger-bg);  border-color: var(--danger);  color: #991b1b; }
+.result-timeout  { background: var(--warning-bg); border-color: var(--warning); color: #92400e; }
+.result-error    { background: var(--danger-bg);  border-color: var(--danger);  color: #991b1b; }
+
+/* ---- Test Result Rows ---- */
+
+.test-result-row {
+    padding: .75rem 1rem;
+    border-radius: var(--radius-sm);
+    margin-bottom: .5rem;
+}
+.test-result-row.test-pass { background: rgba(16, 185, 129, .06); }
+.test-result-row.test-fail { background: rgba(239, 68, 68, .06); }
+
+.test-result-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: .875rem;
+    font-weight: 500;
+}
+.test-result-detail { margin-top: .5rem; }
+.test-data { margin-bottom: .5rem; }
+.test-data pre {
+    font-family: 'Consolas', monospace;
+    font-size: .8rem;
+    background: var(--surface-alt);
+    padding: .4rem .6rem;
+    border-radius: var(--radius-sm);
+    margin-top: .2rem;
+    white-space: pre-wrap;
+}
+
+@media (max-width: 768px) {
+    .filter-bar { flex-direction: column; }
+    .filter-group { min-width: 100%; }
+}

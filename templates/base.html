@@ -53,11 +53,25 @@
                     <span class="nav-icon">📌</span> Assignments
                 </a>
 
+                <div class="nav-section-title">Coding</div>
+                <a href="{{ url_for('coding.dashboard') }}"
+                   class="nav-link {{ 'active' if ep == 'coding.dashboard' }}">
+                    <span class="nav-icon">💻</span> Coding Dashboard
+                </a>
+                <a href="{{ url_for('coding.problems') }}"
+                   class="nav-link {{ 'active' if ep in ('coding.problems','coding.problem_detail') }}">
+                    <span class="nav-icon">🧩</span> Problems
+                </a>
+
                 {% if current_user.is_admin %}
                 <div class="nav-section-title">Admin</div>
                 <a href="{{ url_for('academics.subjects') }}"
                    class="nav-link">
                     <span class="nav-icon">⚙️</span> Manage Subjects
+                </a>
+                <a href="{{ url_for('coding.admin_problems') }}"
+                   class="nav-link {{ 'active' if ep == 'coding.admin_problems' }}">
+                    <span class="nav-icon">📦</span> Manage Problems
                 </a>
                 {% endif %}
             </nav>
