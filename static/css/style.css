@@ -13,11 +13,11 @@
 }
 
 :root {
-    /* Brand palette */
-    --primary:       #6366f1;
-    --primary-dark:  #4f46e5;
-    --primary-light: #a5b4fc;
-    --primary-bg:    #eef2ff;
+    /* Brand palette (Professional Blue) */
+    --primary:       #2563eb;
+    --primary-dark:  #1d4ed8;
+    --primary-light: #93c5fd;
+    --primary-bg:    #eff6ff;
 
     /* Surfaces */
     --surface:     #ffffff;
@@ -42,12 +42,12 @@
     --info:       #3b82f6;
     --info-bg:    #eff6ff;
 
-    /* Sidebar */
-    --sidebar-bg:          #1e1b4b;
-    --sidebar-hover:       #312e81;
-    --sidebar-active:      #4338ca;
-    --sidebar-text:        #c7d2fe;
-    --sidebar-text-bright: #e0e7ff;
+    /* Sidebar (Professional Slate/Navy) */
+    --sidebar-bg:          #0f172a;
+    --sidebar-hover:       #1e293b;
+    --sidebar-active:      #334155;
+    --sidebar-text:        #94a3b8;
+    --sidebar-text-bright: #f8fafc;
     --sidebar-width:       260px;
 
     /* Border radius */
@@ -216,7 +216,7 @@ a { color: var(--primary); }
 
 .auth-layout {
     min-height: 100vh;
-    background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #a855f7 100%);
+    background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
 }
 
 .auth-nav {
