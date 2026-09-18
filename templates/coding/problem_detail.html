@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+{% block title %}{{ problem.title }} — Student Career Platform{% endblock %}
+
+{% block extra_css %}
+<style>
+    .problem-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+    .code-editor { width: 100%; min-height: 350px; font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+                   font-size: .85rem; padding: .75rem; border: 1px solid var(--border); border-radius: var(--radius);
+                   background: #1e1e2e; color: #cdd6f4; resize: vertical; tab-size: 4; line-height: 1.5; }
+    .code-editor:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(99,102,241,.2); }
+    .sample-case { background: var(--surface-alt); border: 1px solid var(--border); border-radius: var(--radius);
+                   padding: .75rem; margin-bottom: .75rem; }
+    .sample-case pre { font-family: 'Consolas', monospace; font-size: .82rem; margin: .25rem 0 0; white-space: pre-wrap; }
+    .sample-label { font-size: .7rem; font-weight: 600; text-transform: uppercase; color: var(--text-secondary); }
+    @media (max-width: 900px) { .problem-layout { grid-template-columns: 1fr; } }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="flex-between mb-6">
+    <div>
+        <a href="{{ url_for('coding.problems') }}" class="btn btn-sm btn-outline" style="margin-bottom:.5rem;">&larr; Back to Problems</a>
+        <h1 style="font-size:1.5rem; font-weight:700;">{{ problem.title }}</h1>
+        <div class="flex gap-2" style="margin-top:.35rem;">
+            <span class="badge badge-primary" style="text-transform:capitalize;">{{ problem.topic }}</span>
+            <span class="badge {{ 'badge-success' if problem.difficulty == 'easy' else ('badge-warning' if problem.difficulty == 'medium' else 'badge-danger') }}">
+                {{ problem.difficulty }}
+            </span>
+            {% if is_solved %}
+                <span class="badge badge-success">Solved</span>
+            {% endif %}
+            <span class="text-muted" style="font-size:.8rem;">{{ total_tests }} test cases</span>
+        </div>
+    </div>
+</div>
+
+<div class="problem-layout">
+    {# ==================== Left: Problem Statement ==================== #}
+    <div>
+        <div class="card mb-6">
+            <div class="card-header"><h2 class="card-title">Problem Statement</h2></div>
+            <div style="white-space:pre-wrap; font-size:.9rem; line-height:1.7;">{{ problem.description }}</div>
+
+            {% if problem.input_format %}
+            <h4 style="margin-top:1.25rem; font-size:.85rem; font-weight:600;">Input Format</h4>
+            <div style="white-space:pre-wrap; font-size:.85rem; color:var(--text-secondary);">{{ problem.input_format }}</div>
+            {% endif %}
+
+            {% if problem.output_format %}
+            <h4 style="margin-top:.75rem; font-size:.85rem; font-weight:600;">Output Format</h4>
+            <div style="white-space:pre-wrap; font-size:.85rem; color:var(--text-secondary);">{{ problem.output_format }}</div>
+            {% endif %}
+        </div>
+
+        {# ---- Sample Test Cases ---- #}
+        {% if sample_cases %}
+        <div class="card">
+            <div class="card-header"><h2 class="card-title">Examples</h2></div>
+            {% for tc in sample_cases %}
+            <div class="sample-case">
+                <div class="sample-label">Input</div>
+                <pre>{{ tc.input_data }}</pre>
+                <div class="sample-label" style="margin-top:.5rem;">Expected Output</div>
+                <pre>{{ tc.expected_output }}</pre>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+
+    {# ==================== Right: Code Editor + Submit ==================== #}
+    <div>
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title">Submit Solution (Python)</h2>
+            </div>
+            <form method="POST" action="{{ url_for('coding.problem_detail', problem_id=problem.id) }}" novalidate>
+                {{ form.hidden_tag() }}
+                <div class="form-group">
+                    {{ form.code(class="code-editor", placeholder="# Write your Python solution here...\n\n# Read input with input()\n# Print output with print()") }}
+                    {% if form.code.errors %}
+                        {% for error in form.code.errors %}
+                            <div class="form-error">{{ error }}</div>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+                {{ form.submit(class="btn btn-primary btn-block") }}
+            </form>
+        </div>
+
+        {# ---- Previous Submissions ---- #}
+        {% if submissions %}
+        <div class="card mt-6">
+            <div class="card-header"><h2 class="card-title">Your Submissions</h2></div>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Result</th>
+                            <th>Tests</th>
+                            <th>Time</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for s in submissions %}
+                        <tr>
+                            <td>
+                                <a href="{{ url_for('coding.submission_result', problem_id=problem.id, submission_id=s.id) }}">
+                                    <span class="badge {{ 'badge-success' if s.result == 'accepted' else ('badge-warning' if s.result == 'timeout' else 'badge-danger') }}">
+                                        {{ s.result | replace('_', ' ') }}
+                                    </span>
+                                </a>
+                            </td>
+                            <td>{{ s.tests_passed }}/{{ s.tests_total }}</td>
+                            <td class="text-muted" style="font-size:.8rem;">{{ s.submitted_at }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

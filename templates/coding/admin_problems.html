@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}Manage Problems — Admin{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>Manage Coding Problems</h1>
+    <p>{{ problems | length }} problems in the database</p>
+</div>
+
+<div class="card">
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Title</th>
+                    <th>Topic</th>
+                    <th>Difficulty</th>
+                    <th>Test Cases</th>
+                    <th>Created</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for p in problems %}
+                <tr>
+                    <td>{{ p.id }}</td>
+                    <td><a href="{{ url_for('coding.problem_detail', problem_id=p.id) }}">{{ p.title }}</a></td>
+                    <td><span class="badge badge-primary" style="text-transform:capitalize;">{{ p.topic }}</span></td>
+                    <td>
+                        <span class="badge {{ 'badge-success' if p.difficulty == 'easy' else ('badge-warning' if p.difficulty == 'medium' else 'badge-danger') }}">
+                            {{ p.difficulty }}
+                        </span>
+                    </td>
+                    <td>{{ p.test_count }}</td>
+                    <td class="text-muted">{{ p.created_at }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

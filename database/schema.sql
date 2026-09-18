@@ -85,3 +85,49 @@ CREATE TABLE IF NOT EXISTS assignments (
     FOREIGN KEY (user_id)    REFERENCES users(id)    ON DELETE CASCADE,
     FOREIGN KEY (subject_id) REFERENCES subjects(id) ON DELETE CASCADE
 );
+
+
+-- ============================================================
+-- Week 2: Coding Practice Platform
+-- ============================================================
+
+-- Coding problems (seeded by admin / service)
+CREATE TABLE IF NOT EXISTS coding_problems (
+    id              INTEGER PRIMARY KEY AUTOINCREMENT,
+    title           TEXT    NOT NULL,
+    topic           TEXT    NOT NULL,
+    difficulty      TEXT    NOT NULL CHECK(difficulty IN ('easy','medium','hard')),
+    description     TEXT    NOT NULL,
+    input_format    TEXT,
+    output_format   TEXT,
+    examples        TEXT,
+    created_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Test cases for each problem
+CREATE TABLE IF NOT EXISTS test_cases (
+    id              INTEGER PRIMARY KEY AUTOINCREMENT,
+    problem_id      INTEGER NOT NULL,
+    input_data      TEXT    NOT NULL,
+    expected_output TEXT    NOT NULL,
+    is_sample       INTEGER DEFAULT 0,
+    created_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (problem_id) REFERENCES coding_problems(id) ON DELETE CASCADE
+);
+
+-- Student code submissions
+CREATE TABLE IF NOT EXISTS coding_submissions (
+    id              INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id         INTEGER NOT NULL,
+    problem_id      INTEGER NOT NULL,
+    code            TEXT    NOT NULL,
+    language        TEXT    NOT NULL DEFAULT 'python',
+    result          TEXT    NOT NULL
+                            CHECK(result IN ('accepted','wrong_answer','error','timeout')),
+    tests_passed    INTEGER DEFAULT 0,
+    tests_total     INTEGER DEFAULT 0,
+    result_detail   TEXT,
+    submitted_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id)    REFERENCES users(id)           ON DELETE CASCADE,
+    FOREIGN KEY (problem_id) REFERENCES coding_problems(id) ON DELETE CASCADE
+);

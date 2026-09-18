@@ -48,15 +48,18 @@ def create_app(config_class=Config):
     with app.app_context():
         init_db()
         _seed_admin()
+        _seed_coding_problems()
 
     # --- Blueprints ---
     from routes.main import main_bp
     from routes.auth import auth_bp
     from routes.academics import academics_bp
+    from routes.coding import coding_bp
 
     app.register_blueprint(main_bp)
     app.register_blueprint(auth_bp)
     app.register_blueprint(academics_bp)      # url_prefix set inside the blueprint
+    app.register_blueprint(coding_bp)         # url_prefix='/coding'
 
     return app
 
@@ -73,6 +76,12 @@ def _seed_admin():
         )
         db.commit()
         print('  [OK] Default admin account created  (admin / admin123)')
+
+
+def _seed_coding_problems():
+    """Seed the initial set of coding problems if the table is empty."""
+    from services.coding_service import seed_problems
+    seed_problems()
 
 
 # ------------------------------------------------------------------
