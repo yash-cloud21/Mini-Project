@@ -292,9 +292,10 @@
         
         // --- Academic Chart ---
         {% if acad_summary.subjects %}
+        const rawAcademicData = {{ acad_summary.subjects | tojson | safe }};
         const acadCtx = document.getElementById('academicChart').getContext('2d');
-        const subjectLabels = [{% for s in acad_summary.subjects %}'{{ s.name }}'{% if not loop.last %}, {% endif %}{% endfor %}];
-        const attendanceData = [{% for s in acad_summary.subjects %}{{ s.attendance_percent }}{% if not loop.last %}, {% endif %}{% endfor %}];
+        const subjectLabels = rawAcademicData.map(s => s.name);
+        const attendanceData = rawAcademicData.map(s => s.attendance_percent);
         
         new Chart(acadCtx, {
             type: 'bar',
@@ -333,16 +334,17 @@
         
         // --- Coding Chart (Topic Progress) ---
         {% if coding_summary.attempted > 0 and coding_summary.topics %}
+        const rawCodingTopics = {{ coding_summary.topics | tojson | safe }};
         const codingCtx = document.getElementById('codingChart').getContext('2d');
         
-        // Filter out topics with 0 attempted to keep chart clean
-        const topics = [
-            {% for t in coding_summary.topics %}
-                {% if t.solved > 0 %}
-                    { label: '{{ t.topic|title }}', solved: {{ t.solved }}, total: {{ t.total }} },
-                {% endif %}
-            {% endfor %}
-        ];
+        // Filter out topics with 0 solved to keep chart clean
+        const topics = rawCodingTopics
+            .filter(t => t.solved > 0)
+            .map(t => ({
+                label: t.topic.charAt(0).toUpperCase() + t.topic.slice(1), // Capitalize
+                solved: t.solved,
+                total: t.total
+            }));
         
         if (topics.length > 0) {
             new Chart(codingCtx, {
