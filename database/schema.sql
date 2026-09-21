@@ -187,3 +187,34 @@ CREATE TABLE IF NOT EXISTS extracted_projects (
     description         TEXT,
     FOREIGN KEY (resume_id) REFERENCES resumes(id) ON DELETE CASCADE
 );
+
+
+-- ============================================================
+-- Week 4: Career Skill Matching
+-- ============================================================
+
+-- Predefined Job Roles
+CREATE TABLE IF NOT EXISTS job_roles (
+    id                  INTEGER PRIMARY KEY AUTOINCREMENT,
+    title               TEXT    UNIQUE NOT NULL,
+    description         TEXT
+);
+
+-- Required Skills for a Job Role
+CREATE TABLE IF NOT EXISTS job_skills (
+    id                  INTEGER PRIMARY KEY AUTOINCREMENT,
+    role_id             INTEGER NOT NULL,
+    skill_name          TEXT    NOT NULL,
+    is_core             INTEGER DEFAULT 1, -- 1 for required, 0 for nice-to-have
+    FOREIGN KEY (role_id) REFERENCES job_roles(id) ON DELETE CASCADE
+);
+
+-- Student's Target Role
+CREATE TABLE IF NOT EXISTS student_target_role (
+    id                  INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id             INTEGER UNIQUE NOT NULL,
+    role_id             INTEGER NOT NULL,
+    selected_at         TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (role_id) REFERENCES job_roles(id) ON DELETE CASCADE
+);

@@ -19,7 +19,32 @@ def home():
 @main_bp.route('/dashboard')
 @login_required
 def dashboard():
-    """Authenticated overview — shows quick stats and action links."""
+    """Unified Dashboard — shows stats from Academics, Coding, Resume, and Career."""
     from services.academic_service import get_academic_summary
-    summary = get_academic_summary(current_user.id)
-    return render_template('dashboard.html', summary=summary)
+    from services.coding_service import get_coding_summary
+    from services.resume_service import get_user_resumes, get_resume_details
+    from services.career_service import analyze_skill_gap
+
+    # 1. Academics
+    acad_summary = get_academic_summary(current_user.id)
+    
+    # 2. Coding
+    coding_summary = get_coding_summary(current_user.id)
+    
+    # 3. Resume
+    resumes = get_user_resumes(current_user.id)
+    resume_details = None
+    if resumes:
+        # Get latest resume details
+        resume_details = get_resume_details(resumes[0]['id'], current_user.id)
+        
+    # 4. Career Match
+    career_match = analyze_skill_gap(current_user.id)
+    
+    return render_template(
+        'dashboard.html', 
+        acad_summary=acad_summary,
+        coding_summary=coding_summary,
+        resume_details=resume_details,
+        career_match=career_match
+    )

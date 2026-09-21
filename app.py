@@ -52,19 +52,21 @@ def create_app(config_class=Config):
         init_db()
         _seed_admin()
         _seed_coding_problems()
+        _seed_job_roles()
 
-    # --- Blueprints ---
     from routes.main import main_bp
     from routes.auth import auth_bp
     from routes.academics import academics_bp
     from routes.coding import coding_bp
     from routes.resume import resume_bp
+    from routes.career import career_bp
 
     app.register_blueprint(main_bp)
     app.register_blueprint(auth_bp)
     app.register_blueprint(academics_bp)      # url_prefix set inside the blueprint
     app.register_blueprint(coding_bp)         # url_prefix='/coding'
     app.register_blueprint(resume_bp)
+    app.register_blueprint(career_bp)
 
     return app
 
@@ -87,6 +89,12 @@ def _seed_coding_problems():
     """Seed the initial set of coding problems if the table is empty."""
     from services.coding_service import seed_problems
     seed_problems()
+
+
+def _seed_job_roles():
+    """Seed the predefined job roles if the table is empty."""
+    from services.career_service import seed_job_roles
+    seed_job_roles()
 
 
 # ------------------------------------------------------------------

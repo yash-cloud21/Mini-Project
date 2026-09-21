@@ -1,0 +1,152 @@
+{% extends 'base.html' %}
+
+{% block title %}Skill Gap Analysis{% endblock %}
+
+{% block extra_css %}
+<style>
+    .skill-pill {
+        display: inline-block;
+        padding: 6px 16px;
+        border-radius: 20px;
+        font-size: 0.9rem;
+        margin: 4px;
+        font-weight: 500;
+    }
+    .skill-match {
+        background-color: rgba(16, 185, 129, 0.1);
+        color: #059669;
+        border: 1px solid rgba(16, 185, 129, 0.2);
+    }
+    .skill-missing {
+        background-color: rgba(239, 68, 68, 0.1);
+        color: #dc2626;
+        border: 1px solid rgba(239, 68, 68, 0.2);
+    }
+    .skill-extra {
+        background-color: rgba(59, 130, 246, 0.1);
+        color: #2563eb;
+        border: 1px solid rgba(59, 130, 246, 0.2);
+    }
+    
+    .progress-circle {
+        position: relative;
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        background: conic-gradient(var(--primary) {{ data.match_percentage }}%, var(--border) 0deg);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 16px;
+    }
+    .progress-circle::before {
+        content: "";
+        position: absolute;
+        inset: 10px;
+        background-color: var(--bg-card);
+        border-radius: 50%;
+    }
+    .progress-value {
+        position: relative;
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--text);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1>Skill Gap Analysis</h1>
+        <p class="text-muted">Target Role: <strong style="color: var(--text)">{{ data.target_role.title }}</strong></p>
+    </div>
+    <a href="{{ url_for('career.select_role') }}" class="btn btn-outline">Change Target Role</a>
+</div>
+
+<div class="grid" style="grid-template-columns: 1fr 2fr; gap: 24px;">
+    
+    <!-- Match Score Summary -->
+    <div class="card text-center" style="display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 32px;">
+        <div class="progress-circle">
+            <span class="progress-value">{{ data.match_percentage }}%</span>
+        </div>
+        <h3 style="margin-bottom: 8px;">Match Score</h3>
+        <p class="text-muted">Based on extracted skills from your latest resume.</p>
+        
+        <div style="margin-top: 24px; text-align: left; width: 100%;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid var(--border);">
+                <span class="text-muted">Total Required</span>
+                <strong>{{ data.total_required }}</strong>
+            </div>
+            <div style="display: flex; justify-content: space-between; margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid var(--border);">
+                <span class="text-muted">Matched Skills</span>
+                <strong style="color: #059669">{{ data.matched_skills|length }}</strong>
+            </div>
+            <div style="display: flex; justify-content: space-between;">
+                <span class="text-muted">Missing Skills</span>
+                <strong style="color: #dc2626">{{ data.missing_skills|length }}</strong>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Detailed Breakdown -->
+    <div style="display: flex; flex-direction: column; gap: 24px;">
+        
+        <!-- Matched Skills -->
+        <div class="card">
+            <div class="card-header" style="display: flex; align-items: center; gap: 8px;">
+                <i data-lucide="check-circle" style="color: #10b981;"></i>
+                <h3 class="card-title">Matched Skills</h3>
+            </div>
+            <div class="card-body">
+                {% if data.matched_skills %}
+                    {% for skill in data.matched_skills %}
+                        <span class="skill-pill skill-match">{{ skill }}</span>
+                    {% endfor %}
+                {% else %}
+                    <p class="text-muted">No matching skills found in your resume.</p>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Missing Skills -->
+        <div class="card">
+            <div class="card-header" style="display: flex; align-items: center; gap: 8px;">
+                <i data-lucide="alert-circle" style="color: #ef4444;"></i>
+                <h3 class="card-title">Missing Skills (To Learn)</h3>
+            </div>
+            <div class="card-body">
+                {% if data.missing_skills %}
+                    <p class="text-muted" style="margin-bottom: 16px;">Focus on learning these technologies to improve your match for the {{ data.target_role.title }} role.</p>
+                    {% for skill in data.missing_skills %}
+                        <span class="skill-pill skill-missing">{{ skill }}</span>
+                    {% endfor %}
+                {% else %}
+                    <p class="text-muted">You have all the core skills required for this role!</p>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Extra Skills -->
+        <div class="card">
+            <div class="card-header" style="display: flex; align-items: center; gap: 8px;">
+                <i data-lucide="plus-circle" style="color: #3b82f6;"></i>
+                <h3 class="card-title">Additional Skills</h3>
+            </div>
+            <div class="card-body">
+                {% if data.extra_skills %}
+                    <p class="text-muted" style="margin-bottom: 16px;">These skills from your resume are not strictly required for this role, but make you a stronger candidate.</p>
+                    {% for skill in data.extra_skills %}
+                        <span class="skill-pill skill-extra">{{ skill }}</span>
+                    {% endfor %}
+                {% else %}
+                    <p class="text-muted">No additional skills found.</p>
+                {% endif %}
+            </div>
+        </div>
+        
+    </div>
+    
+</div>
+{% endblock %}

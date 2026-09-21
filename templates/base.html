@@ -75,6 +75,16 @@
                     <i data-lucide="file-badge" class="nav-icon icon-rose"></i> Resume Analyzer
                 </a>
 
+                <div class="nav-section-title">Career</div>
+                <a href="{{ url_for('career.select_role') }}"
+                   class="nav-link {{ 'active' if ep == 'career.select_role' }}">
+                    <i data-lucide="target" class="nav-icon icon-purple"></i> Target Role
+                </a>
+                <a href="{{ url_for('career.analysis') }}"
+                   class="nav-link {{ 'active' if ep == 'career.analysis' }}">
+                    <i data-lucide="pie-chart" class="nav-icon icon-teal"></i> Skill Gap Analysis
+                </a>
+
                 {% if current_user.is_admin %}
                 <div class="nav-section-title">Admin</div>
                 <a href="{{ url_for('academics.subjects') }}"

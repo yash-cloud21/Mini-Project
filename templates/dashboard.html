@@ -1,80 +1,348 @@
-{% extends "base.html" %}
-{% block title %}Dashboard — Student Career Platform{% endblock %}
+{% extends 'base.html' %}
+
+{% block title %}Unified Dashboard - Student Career Platform{% endblock %}
+
+{% block extra_css %}
+<style>
+    .stat-card {
+        padding: 24px;
+        border-radius: 12px;
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        transition: transform 0.2s;
+    }
+    .stat-card:hover {
+        transform: translateY(-2px);
+    }
+    .stat-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .stat-icon i {
+        width: 24px;
+        height: 24px;
+        color: white;
+    }
+    .stat-content h3 {
+        font-size: 0.9rem;
+        color: var(--text-muted);
+        margin: 0 0 4px 0;
+    }
+    .stat-content p {
+        font-size: 1.5rem;
+        font-weight: 700;
+        margin: 0;
+        color: var(--text);
+    }
+    .module-section {
+        margin-bottom: 40px;
+    }
+    .module-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 24px;
+        padding-bottom: 12px;
+        border-bottom: 2px solid var(--border);
+    }
+    .module-header h2 {
+        margin: 0;
+        font-size: 1.25rem;
+    }
+    .module-header i {
+        width: 24px;
+        height: 24px;
+    }
+    .chart-container {
+        position: relative;
+        height: 250px;
+        width: 100%;
+    }
+    .skill-pill {
+        display: inline-block;
+        padding: 4px 12px;
+        border-radius: 16px;
+        font-size: 0.85rem;
+        background: var(--bg-alt);
+        border: 1px solid var(--border);
+        margin: 4px;
+    }
+</style>
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{% endblock %}
 
 {% block content %}
-<div class="page-header">
-    <h1>Welcome back, {{ current_user.username }}! 👋</h1>
-    <p>Here's your quick overview and shortcuts</p>
+<div class="page-header" style="margin-bottom: 32px;">
+    <div>
+        <h1>Welcome back, {{ current_user.username }}!</h1>
+        <p class="text-muted">Here is your unified profile overview.</p>
+    </div>
 </div>
 
-{# ---- Quick Stats (if any academic data exists) ---- #}
-{% if summary and summary.total_subjects > 0 %}
-<div class="summary-grid">
-    <div class="summary-card primary">
-        <div class="summary-label">Subjects</div>
-        <div class="summary-value">{{ summary.total_subjects }}</div>
-        <div class="summary-detail">Active subjects</div>
+<!-- TOP LEVEL STATS -->
+<div class="grid" style="grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; margin-bottom: 40px;">
+    <div class="stat-card">
+        <div class="stat-icon" style="background: linear-gradient(135deg, #3b82f6, #2563eb);">
+            <i data-lucide="graduation-cap"></i>
+        </div>
+        <div class="stat-content">
+            <h3>Avg Attendance</h3>
+            <p>{{ acad_summary.avg_attendance }}%</p>
+        </div>
     </div>
-    <div class="summary-card success">
-        <div class="summary-label">Marks</div>
-        <div class="summary-value">{{ summary.overall_marks }}%</div>
-        <div class="summary-detail">Average across exams</div>
+    
+    <div class="stat-card">
+        <div class="stat-icon" style="background: linear-gradient(135deg, #f59e0b, #d97706);">
+            <i data-lucide="code"></i>
+        </div>
+        <div class="stat-content">
+            <h3>Problems Solved</h3>
+            <p>{{ coding_summary.solved }} / {{ coding_summary.total }}</p>
+        </div>
     </div>
-    <div class="summary-card warning">
-        <div class="summary-label">Attendance</div>
-        <div class="summary-value">{{ summary.overall_attendance }}%</div>
-        <div class="summary-detail">Classes attended</div>
+    
+    <div class="stat-card">
+        <div class="stat-icon" style="background: linear-gradient(135deg, #ec4899, #db2777);">
+            <i data-lucide="file-text"></i>
+        </div>
+        <div class="stat-content">
+            <h3>Extracted Skills</h3>
+            <p>{{ resume_details.skills|length if resume_details else 0 }}</p>
+        </div>
     </div>
-    <div class="summary-card info">
-        <div class="summary-label">Overall Score</div>
-        <div class="summary-value">{{ summary.overall_score }}%</div>
-        <div class="summary-detail">Weighted academic score</div>
+    
+    <div class="stat-card">
+        <div class="stat-icon" style="background: linear-gradient(135deg, #8b5cf6, #7c3aed);">
+            <i data-lucide="target"></i>
+        </div>
+        <div class="stat-content">
+            <h3>Role Match</h3>
+            <p>{{ career_match.match_percentage if career_match.status == 'success' else 'N/A' }}{% if career_match.status == 'success' %}%{% endif %}</p>
+        </div>
     </div>
 </div>
-{% endif %}
 
-{# ---- Quick Action Cards ---- #}
-<h2 style="margin-bottom: 1rem; font-size: 1.15rem; font-weight: 600;">Quick Actions</h2>
-<div class="action-grid">
-    <a href="{{ url_for('academics.dashboard') }}" class="action-card">
-        <i data-lucide="bar-chart-2" class="action-icon icon-blue"></i>
-        <h3>Academic Dashboard</h3>
-        <p>View detailed academic performance</p>
-    </a>
-    <a href="{{ url_for('academics.add_marks') }}" class="action-card">
-        <i data-lucide="file-text" class="action-icon icon-green"></i>
-        <h3>Add Marks</h3>
-        <p>Record your exam scores</p>
-    </a>
-    <a href="{{ url_for('academics.record_attendance') }}" class="action-card">
-        <i data-lucide="clipboard-check" class="action-icon icon-yellow"></i>
-        <h3>Record Attendance</h3>
-        <p>Log today's attendance</p>
-    </a>
-    <a href="{{ url_for('academics.assignments') }}" class="action-card">
-        <i data-lucide="paperclip" class="action-icon icon-purple"></i>
-        <h3>Assignments</h3>
-        <p>Track your assignments</p>
-    </a>
-    <a href="{{ url_for('auth.profile') }}" class="action-card">
-        <i data-lucide="user" class="action-icon icon-rose"></i>
-        <h3>Profile</h3>
-        <p>Update your profile details</p>
-    </a>
-    <a href="{{ url_for('academics.subjects') }}" class="action-card">
-        <i data-lucide="book-open" class="action-icon icon-teal"></i>
-        <h3>Subjects</h3>
-        <p>Browse available subjects</p>
-    </a>
-    <a href="{{ url_for('coding.dashboard') }}" class="action-card">
-        <i data-lucide="terminal" class="action-icon icon-orange"></i>
-        <h3>Coding Dashboard</h3>
-        <p>Track your coding progress</p>
-    </a>
-    <a href="{{ url_for('coding.problems') }}" class="action-card">
-        <i data-lucide="code" class="action-icon icon-indigo"></i>
-        <h3>Practice Problems</h3>
-        <p>Solve coding challenges</p>
-    </a>
+
+<div class="grid" style="grid-template-columns: 1fr 1fr; gap: 32px;">
+    
+    <!-- LEFT COLUMN -->
+    <div>
+        
+        <!-- ACADEMICS MODULE -->
+        <section class="module-section">
+            <div class="module-header">
+                <i data-lucide="book-open" class="icon-blue"></i>
+                <h2>Academic Performance</h2>
+            </div>
+            <div class="card">
+                <div class="card-body">
+                    {% if acad_summary.subjects %}
+                        <div class="chart-container">
+                            <canvas id="academicChart"></canvas>
+                        </div>
+                    {% else %}
+                        <div class="empty-state" style="padding: 24px;">
+                            <p class="text-muted">No academic data available yet.</p>
+                            <a href="{{ url_for('academics.add_marks') }}" class="btn btn-sm btn-outline">Add Marks</a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </section>
+        
+        <!-- RESUME MODULE -->
+        <section class="module-section">
+            <div class="module-header">
+                <i data-lucide="file-badge" class="icon-rose"></i>
+                <h2>Resume Profile</h2>
+            </div>
+            <div class="card">
+                <div class="card-body">
+                    {% if resume_details %}
+                        <h4 style="margin-bottom: 12px; color: var(--text-muted); font-size: 0.9rem;">Top Skills</h4>
+                        <div style="margin-bottom: 20px;">
+                            {% for skill in resume_details.skills[:8] %}
+                                <span class="skill-pill">{{ skill.skill_name }}</span>
+                            {% endfor %}
+                            {% if resume_details.skills|length > 8 %}
+                                <span class="skill-pill" style="background: transparent; border: none; padding-left: 0;">+{{ resume_details.skills|length - 8 }} more</span>
+                            {% endif %}
+                        </div>
+                        <a href="{{ url_for('resume.view', resume_id=resume_details.id) }}" class="btn btn-sm btn-outline">View Full Resume Analysis</a>
+                    {% else %}
+                        <div class="empty-state" style="padding: 24px;">
+                            <p class="text-muted">No resume uploaded yet.</p>
+                            <a href="{{ url_for('resume.upload') }}" class="btn btn-sm btn-outline">Upload Resume</a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </section>
+        
+    </div>
+    
+    <!-- RIGHT COLUMN -->
+    <div>
+        
+        <!-- CODING MODULE -->
+        <section class="module-section">
+            <div class="module-header">
+                <i data-lucide="terminal" class="icon-orange"></i>
+                <h2>Coding Practice</h2>
+            </div>
+            <div class="card">
+                <div class="card-body">
+                    {% if coding_summary.attempted > 0 %}
+                        <div class="chart-container">
+                            <canvas id="codingChart"></canvas>
+                        </div>
+                    {% else %}
+                        <div class="empty-state" style="padding: 24px;">
+                            <p class="text-muted">You haven't attempted any coding problems.</p>
+                            <a href="{{ url_for('coding.problems') }}" class="btn btn-sm btn-outline">Start Practicing</a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </section>
+        
+        <!-- CAREER MODULE -->
+        <section class="module-section">
+            <div class="module-header">
+                <i data-lucide="target" class="icon-purple"></i>
+                <h2>Career Readiness</h2>
+            </div>
+            <div class="card">
+                <div class="card-body">
+                    {% if career_match.status == 'success' %}
+                        <h3 style="margin-bottom: 4px;">{{ career_match.target_role.title }}</h3>
+                        <p class="text-muted" style="margin-bottom: 20px;">Your match score is <strong>{{ career_match.match_percentage }}%</strong></p>
+                        
+                        <div style="margin-bottom: 16px;">
+                            <h4 style="margin-bottom: 8px; font-size: 0.9rem; color: #dc2626;">Missing Skills (Prioritize Learning)</h4>
+                            {% if career_match.missing_skills %}
+                                {% for skill in career_match.missing_skills[:5] %}
+                                    <span class="skill-pill" style="border-color: #fca5a5; background: #fef2f2; color: #dc2626;">{{ skill }}</span>
+                                {% endfor %}
+                            {% else %}
+                                <p class="text-muted" style="font-size: 0.9rem;">None! You have all required skills.</p>
+                            {% endif %}
+                        </div>
+                        
+                        <a href="{{ url_for('career.analysis') }}" class="btn btn-sm btn-outline">View Full Gap Analysis</a>
+                    {% else %}
+                        <div class="empty-state" style="padding: 24px;">
+                            <p class="text-muted">No target job role selected.</p>
+                            <a href="{{ url_for('career.select_role') }}" class="btn btn-sm btn-outline">Select Target Role</a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </section>
+        
+    </div>
 </div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        
+        // Common Chart Options for Dark Mode Support
+        const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+        const textColor = isDark ? '#94a3b8' : '#64748b';
+        const gridColor = isDark ? '#334155' : '#e2e8f0';
+        
+        // --- Academic Chart ---
+        {% if acad_summary.subjects %}
+        const acadCtx = document.getElementById('academicChart').getContext('2d');
+        const subjectLabels = [{% for s in acad_summary.subjects %}'{{ s.name }}'{% if not loop.last %}, {% endif %}{% endfor %}];
+        const attendanceData = [{% for s in acad_summary.subjects %}{{ s.attendance_percent }}{% if not loop.last %}, {% endif %}{% endfor %}];
+        
+        new Chart(acadCtx, {
+            type: 'bar',
+            data: {
+                labels: subjectLabels,
+                datasets: [{
+                    label: 'Attendance %',
+                    data: attendanceData,
+                    backgroundColor: 'rgba(59, 130, 246, 0.7)',
+                    borderColor: 'rgb(59, 130, 246)',
+                    borderWidth: 1,
+                    borderRadius: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: { 
+                        beginAtZero: true, 
+                        max: 100,
+                        grid: { color: gridColor },
+                        ticks: { color: textColor }
+                    },
+                    x: {
+                        grid: { display: false },
+                        ticks: { color: textColor }
+                    }
+                },
+                plugins: {
+                    legend: { display: false }
+                }
+            }
+        });
+        {% endif %}
+        
+        // --- Coding Chart (Topic Progress) ---
+        {% if coding_summary.attempted > 0 and coding_summary.topics %}
+        const codingCtx = document.getElementById('codingChart').getContext('2d');
+        
+        // Filter out topics with 0 attempted to keep chart clean
+        const topics = [
+            {% for t in coding_summary.topics %}
+                {% if t.solved > 0 %}
+                    { label: '{{ t.topic|title }}', solved: {{ t.solved }}, total: {{ t.total }} },
+                {% endif %}
+            {% endfor %}
+        ];
+        
+        if (topics.length > 0) {
+            new Chart(codingCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: topics.map(t => t.label),
+                    datasets: [{
+                        data: topics.map(t => t.solved),
+                        backgroundColor: [
+                            '#3b82f6', '#10b981', '#f59e0b', '#ec4899', '#8b5cf6', '#14b8a6', '#f43f5e'
+                        ],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '70%',
+                    plugins: {
+                        legend: {
+                            position: 'right',
+                            labels: { color: textColor, boxWidth: 12 }
+                        }
+                    }
+                }
+            });
+        }
+        {% endif %}
+    });
+</script>
 {% endblock %}
