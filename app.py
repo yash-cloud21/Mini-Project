@@ -60,6 +60,7 @@ def create_app(config_class=Config):
     from routes.coding import coding_bp
     from routes.resume import resume_bp
     from routes.career import career_bp
+    from routes.ai import ai_bp
 
     app.register_blueprint(main_bp)
     app.register_blueprint(auth_bp)
@@ -67,6 +68,7 @@ def create_app(config_class=Config):
     app.register_blueprint(coding_bp)         # url_prefix='/coding'
     app.register_blueprint(resume_bp)
     app.register_blueprint(career_bp)
+    app.register_blueprint(ai_bp)
 
     return app
 

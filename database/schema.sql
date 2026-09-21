@@ -218,3 +218,18 @@ CREATE TABLE IF NOT EXISTS student_target_role (
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (role_id) REFERENCES job_roles(id) ON DELETE CASCADE
 );
+
+
+-- ============================================================
+-- Week 5: AI/NLP Insights Cache
+-- ============================================================
+
+CREATE TABLE IF NOT EXISTS ai_insights_cache (
+    id                  INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id             INTEGER NOT NULL,
+    context_type        TEXT    NOT NULL, -- e.g., 'dashboard', 'resume'
+    insight_text        TEXT    NOT NULL,
+    source              TEXT    NOT NULL, -- 'ai' or 'fallback'
+    generated_at        TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);

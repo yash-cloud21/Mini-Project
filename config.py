@@ -17,3 +17,6 @@ class Config:
     # File upload settings
     UPLOAD_FOLDER = os.path.join(BASE_DIR, 'uploads')
     MAX_CONTENT_LENGTH = 16 * 1024 * 1024  # 16 MB max upload size
+
+    # AI Integration
+    GEMINI_API_KEY = os.environ.get('GEMINI_API_KEY')
