@@ -1,0 +1,174 @@
+{% extends 'base.html' %}
+
+{% block title %}Resume Details - {{ resume.original_filename }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .skill-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 4px 12px;
+        border-radius: 20px;
+        background: var(--bg-alt);
+        border: 1px solid var(--border);
+        font-size: 0.85rem;
+        margin: 4px;
+        color: var(--text);
+    }
+    .skill-category {
+        margin-bottom: 24px;
+    }
+    .skill-category h4 {
+        margin-bottom: 12px;
+        font-size: 1rem;
+        color: var(--text-muted);
+        text-transform: capitalize;
+    }
+    .extraction-notice {
+        background: rgba(59, 130, 246, 0.1);
+        border-left: 4px solid var(--primary);
+        padding: 12px 16px;
+        border-radius: 4px;
+        margin-bottom: 24px;
+        display: flex;
+        gap: 12px;
+        align-items: flex-start;
+    }
+    .extraction-notice i {
+        color: var(--primary);
+        flex-shrink: 0;
+    }
+    .extracted-item {
+        padding: 16px;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        margin-bottom: 16px;
+        background: var(--bg-alt);
+    }
+    .extracted-item h4 {
+        margin-bottom: 4px;
+        color: var(--primary);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1>Resume Analysis</h1>
+        <p class="text-muted">Viewing details for <strong style="color: var(--text)">{{ resume.original_filename }}</strong></p>
+    </div>
+    <a href="{{ url_for('resume.dashboard') }}" class="btn btn-outline">
+        <i data-lucide="arrow-left"></i> Back to Dashboard
+    </a>
+</div>
+
+<div class="extraction-notice">
+    <i data-lucide="info"></i>
+    <div>
+        <h4 style="margin-bottom: 4px;">Extracted Information</h4>
+        <p class="text-muted" style="font-size: 0.9rem;">The data below was automatically extracted from your PDF using keyword matching and heuristics. It may not be 100% accurate or complete.</p>
+    </div>
+</div>
+
+<div class="grid" style="grid-template-columns: 1fr 1fr; gap: 24px;">
+    
+    <!-- Left Column: Skills -->
+    <div style="display: flex; flex-direction: column; gap: 24px;">
+        <div class="card">
+            <div class="card-header" style="display: flex; align-items: center; gap: 8px;">
+                <i data-lucide="zap" class="icon-yellow"></i>
+                <h3 class="card-title">Extracted Skills</h3>
+            </div>
+            <div class="card-body">
+                {% if resume.skills %}
+                    {# Group skills by category #}
+                    {% set categories = {} %}
+                    {% for skill in resume.skills %}
+                        {% if skill.skill_category not in categories %}
+                            {% set _ = categories.update({skill.skill_category: []}) %}
+                        {% endif %}
+                        {% set _ = categories[skill.skill_category].append(skill.skill_name) %}
+                    {% endfor %}
+                    
+                    {% for category, items in categories.items() %}
+                        <div class="skill-category">
+                            <h4>{{ category.replace('_', ' ') }}</h4>
+                            <div>
+                                {% for item in items %}
+                                    <span class="skill-badge">{{ item }}</span>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <p class="text-muted">No skills were confidently extracted from this resume.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- Right Column: Edu, Exp, Proj -->
+    <div style="display: flex; flex-direction: column; gap: 24px;">
+        
+        <div class="card">
+            <div class="card-header" style="display: flex; align-items: center; gap: 8px;">
+                <i data-lucide="graduation-cap" class="icon-blue"></i>
+                <h3 class="card-title">Education (Heuristics)</h3>
+            </div>
+            <div class="card-body">
+                {% if resume.education %}
+                    {% for edu in resume.education %}
+                    <div class="extracted-item">
+                        <h4>{{ edu.degree }}</h4>
+                        <p class="text-muted">{{ edu.institution }}</p>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <p class="text-muted">No education details could be parsed.</p>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-header" style="display: flex; align-items: center; gap: 8px;">
+                <i data-lucide="briefcase" class="icon-purple"></i>
+                <h3 class="card-title">Experience</h3>
+            </div>
+            <div class="card-body">
+                {% if resume.experience %}
+                    {% for exp in resume.experience %}
+                    <div class="extracted-item">
+                        <h4>{{ exp.company }}</h4>
+                        <p class="text-muted">{{ exp.role }}</p>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <p class="text-muted">No experience details could be parsed.</p>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-header" style="display: flex; align-items: center; gap: 8px;">
+                <i data-lucide="folder-kanban" class="icon-green"></i>
+                <h3 class="card-title">Projects</h3>
+            </div>
+            <div class="card-body">
+                {% if resume.projects %}
+                    {% for proj in resume.projects %}
+                    <div class="extracted-item">
+                        <h4>{{ proj.title }}</h4>
+                        <p class="text-muted">{{ proj.description }}</p>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <p class="text-muted">No projects could be parsed.</p>
+                {% endif %}
+            </div>
+        </div>
+        
+    </div>
+    
+</div>
+{% endblock %}

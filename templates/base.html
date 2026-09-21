@@ -69,6 +69,12 @@
                     <i data-lucide="code" class="nav-icon icon-indigo"></i> Problems
                 </a>
 
+                <div class="nav-section-title">Resume</div>
+                <a href="{{ url_for('resume.dashboard') }}"
+                   class="nav-link {{ 'active' if ep and ep.startswith('resume.') }}">
+                    <i data-lucide="file-badge" class="nav-icon icon-rose"></i> Resume Analyzer
+                </a>
+
                 {% if current_user.is_admin %}
                 <div class="nav-section-title">Admin</div>
                 <a href="{{ url_for('academics.subjects') }}"

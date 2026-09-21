@@ -58,11 +58,13 @@ def create_app(config_class=Config):
     from routes.auth import auth_bp
     from routes.academics import academics_bp
     from routes.coding import coding_bp
+    from routes.resume import resume_bp
 
     app.register_blueprint(main_bp)
     app.register_blueprint(auth_bp)
     app.register_blueprint(academics_bp)      # url_prefix set inside the blueprint
     app.register_blueprint(coding_bp)         # url_prefix='/coding'
+    app.register_blueprint(resume_bp)
 
     return app
 

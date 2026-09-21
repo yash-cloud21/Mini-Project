@@ -131,3 +131,59 @@ CREATE TABLE IF NOT EXISTS coding_submissions (
     FOREIGN KEY (user_id)    REFERENCES users(id)           ON DELETE CASCADE,
     FOREIGN KEY (problem_id) REFERENCES coding_problems(id) ON DELETE CASCADE
 );
+
+
+-- ============================================================
+-- Week 3: Resume Analyzer
+-- ============================================================
+
+-- Uploaded Resumes
+CREATE TABLE IF NOT EXISTS resumes (
+    id                  INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id             INTEGER NOT NULL,
+    filename            TEXT    NOT NULL,
+    original_filename   TEXT    NOT NULL,
+    file_path           TEXT    NOT NULL,
+    upload_date         TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    raw_text            TEXT,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+-- Extracted Skills
+CREATE TABLE IF NOT EXISTS extracted_skills (
+    id                  INTEGER PRIMARY KEY AUTOINCREMENT,
+    resume_id           INTEGER NOT NULL,
+    skill_category      TEXT,
+    skill_name          TEXT    NOT NULL,
+    FOREIGN KEY (resume_id) REFERENCES resumes(id) ON DELETE CASCADE
+);
+
+-- Extracted Education
+CREATE TABLE IF NOT EXISTS extracted_education (
+    id                  INTEGER PRIMARY KEY AUTOINCREMENT,
+    resume_id           INTEGER NOT NULL,
+    institution         TEXT,
+    degree              TEXT,
+    year                TEXT,
+    FOREIGN KEY (resume_id) REFERENCES resumes(id) ON DELETE CASCADE
+);
+
+-- Extracted Experience
+CREATE TABLE IF NOT EXISTS extracted_experience (
+    id                  INTEGER PRIMARY KEY AUTOINCREMENT,
+    resume_id           INTEGER NOT NULL,
+    company             TEXT,
+    role                TEXT,
+    duration            TEXT,
+    description         TEXT,
+    FOREIGN KEY (resume_id) REFERENCES resumes(id) ON DELETE CASCADE
+);
+
+-- Extracted Projects
+CREATE TABLE IF NOT EXISTS extracted_projects (
+    id                  INTEGER PRIMARY KEY AUTOINCREMENT,
+    resume_id           INTEGER NOT NULL,
+    title               TEXT,
+    description         TEXT,
+    FOREIGN KEY (resume_id) REFERENCES resumes(id) ON DELETE CASCADE
+);

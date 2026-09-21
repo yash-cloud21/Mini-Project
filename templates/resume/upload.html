@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+
+{% block title %}Upload Resume - Resume Analyzer{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1>Upload Resume</h1>
+        <p class="text-muted">Upload your PDF resume to extract skills and details</p>
+    </div>
+    <a href="{{ url_for('resume.dashboard') }}" class="btn btn-outline">
+        <i data-lucide="arrow-left"></i> Back to Dashboard
+    </a>
+</div>
+
+<div class="card" style="max-width: 600px; margin: 0 auto;">
+    <div class="card-body">
+        <form method="POST" enctype="multipart/form-data">
+            {{ form.hidden_tag() }}
+            
+            <div class="form-group" style="margin-bottom: 24px;">
+                {{ form.resume_file.label(class="form-label") }}
+                <div style="border: 2px dashed var(--border); padding: 32px; border-radius: 8px; text-align: center; background: var(--bg-alt);">
+                    <i data-lucide="file-up" style="width: 48px; height: 48px; color: var(--primary); margin-bottom: 16px;"></i>
+                    {{ form.resume_file(class="form-control", style="margin: 0 auto; max-width: 300px;") }}
+                    <p class="text-muted" style="margin-top: 12px; font-size: 0.9rem;">Only PDF files are supported (Max 16MB)</p>
+                </div>
+                {% for error in form.resume_file.errors %}
+                <span class="text-danger" style="display: block; margin-top: 8px;">{{ error }}</span>
+                {% endfor %}
+            </div>
+            
+            <div style="text-align: right;">
+                {{ form.submit(class="btn btn-primary", style="width: 100%") }}
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

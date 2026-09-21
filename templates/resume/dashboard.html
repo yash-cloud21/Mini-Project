@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+
+{% block title %}Resume Analyzer - Dashboard{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1>Resume Analyzer</h1>
+        <p class="text-muted">Upload and extract information from your resume</p>
+    </div>
+    <a href="{{ url_for('resume.upload') }}" class="btn btn-primary">
+        <i data-lucide="upload"></i> Upload New Resume
+    </a>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h3 class="card-title">Your Uploaded Resumes</h3>
+    </div>
+    <div class="card-body p-0">
+        {% if resumes %}
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Filename</th>
+                        <th>Upload Date</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for resume in resumes %}
+                    <tr>
+                        <td>
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <i data-lucide="file-text" class="icon-rose" style="width: 16px; height: 16px;"></i>
+                                {{ resume.original_filename }}
+                            </div>
+                        </td>
+                        <td>{{ resume.upload_date }}</td>
+                        <td>
+                            <a href="{{ url_for('resume.view', resume_id=resume.id) }}" class="btn btn-sm btn-outline">
+                                View Analysis
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <div class="empty-state-icon">
+                <i data-lucide="file-search" style="width: 48px; height: 48px; color: var(--text-muted);"></i>
+            </div>
+            <h3>No Resumes Uploaded</h3>
+            <p class="text-muted" style="margin-bottom: 24px;">Upload your first resume to see extracted skills and details.</p>
+            <a href="{{ url_for('resume.upload') }}" class="btn btn-primary">Upload Resume</a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
