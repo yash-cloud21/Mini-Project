@@ -78,11 +78,10 @@
     </div>
 </div>
 {% else %}
-<div class="empty-state">
-    <div class="empty-state-icon">🧩</div>
+<div class="empty-state card">
+    <i data-lucide="code" style="width: 48px; height: 48px; color: var(--text-muted); margin-bottom: 16px;"></i>
     <h3>No Problems Found</h3>
-    <p>Try adjusting your filters or check back later.</p>
-    <a href="{{ url_for('coding.problems') }}" class="btn btn-primary">Clear Filters</a>
+    <p class="text-muted">There are no coding problems matching your current filters.</p>
 </div>
 {% endif %}
 {% endblock %}

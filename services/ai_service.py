@@ -6,6 +6,9 @@ from database.db import get_db
 
 # Try importing the AI library
 try:
+    import warnings
+    warnings.filterwarnings("ignore", category=FutureWarning, module="google.generativeai")
+    
     import google.generativeai as genai
     AI_AVAILABLE = True
 except ImportError:

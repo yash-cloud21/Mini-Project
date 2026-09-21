@@ -1,6 +1,6 @@
 import os
 import re
-import fitz  # PyMuPDF
+import pymupdf as fitz  # PyMuPDF
 from werkzeug.utils import secure_filename
 from database.db import get_db
 
@@ -101,7 +101,16 @@ def extract_projects(text):
 
 def process_resume(user_id, file, upload_folder):
     filename = secure_filename(file.filename)
-    # Ensure filename is unique for the user to prevent overwrites, or just store with timestamp
+    if not filename.lower().endswith('.pdf'):
+        raise ValueError("Only PDF files are allowed.")
+        
+    # Security: Verify actual file content (Magic Bytes)
+    header = file.read(5)
+    file.seek(0) # Reset file pointer after reading
+    if header != b'%PDF-':
+        raise ValueError("Invalid file content. Expected a valid PDF document.")
+        
+    # Ensure filename is unique for the user to prevent overwrites
     import time
     unique_filename = f"{user_id}_{int(time.time())}_{filename}"
     file_path = os.path.join(upload_folder, unique_filename)

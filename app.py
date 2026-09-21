@@ -13,7 +13,7 @@ Default admin account (created on first launch):
 
 import os
 
-from flask import Flask
+from flask import Flask, render_template
 from flask_login import LoginManager
 from flask_wtf import CSRFProtect
 from werkzeug.security import generate_password_hash
@@ -39,8 +39,8 @@ def create_app(config_class=Config):
     def load_user(user_id):
         return User.get_by_id(int(user_id))
 
-    # Load SECRET_KEY from environment variables for deployment, fallback to default for local
-    app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-secret-key-change-in-prod')
+    # Load SECRET_KEY from config which now guarantees a secure key
+    app.config['SECRET_KEY'] = config_class.SECRET_KEY
 
     # --- Database ---
     init_db_app(app)
@@ -69,6 +69,15 @@ def create_app(config_class=Config):
     app.register_blueprint(resume_bp)
     app.register_blueprint(career_bp)
     app.register_blueprint(ai_bp)
+
+    # --- Error Handlers ---
+    @app.errorhandler(404)
+    def page_not_found(e):
+        return render_template('errors/404.html'), 404
+
+    @app.errorhandler(500)
+    def internal_server_error(e):
+        return render_template('errors/500.html'), 500
 
     return app
 
@@ -103,4 +112,5 @@ def _seed_job_roles():
 
 if __name__ == '__main__':
     app = create_app()
-    app.run(debug=True, port=5000)
+    # Security: debug=False for production/demo builds to prevent RCE through Werkzeug debugger
+    app.run(debug=False, port=5000)

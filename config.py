@@ -9,7 +9,8 @@ class Config:
     BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 
     # Secret key for session management and CSRF protection
-    SECRET_KEY = os.environ.get('SECRET_KEY') or 'dev-secret-key-change-in-production'
+    # Security: Read from env, fallback to secure random bytes (NOT a hardcoded string)
+    SECRET_KEY = os.environ.get('SECRET_KEY') or os.urandom(32).hex()
 
     # SQLite database path
     DATABASE = os.path.join(BASE_DIR, 'database', 'platform.db')
