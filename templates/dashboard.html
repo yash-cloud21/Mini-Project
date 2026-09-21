@@ -279,6 +279,16 @@
     </div>
 </div>
 
+</div>
+
+<!-- Data injected for JavaScript -->
+<script id="academicData" type="application/json">
+    {{ acad_summary.subjects | default([]) | tojson | safe }}
+</script>
+<script id="codingData" type="application/json">
+    {{ coding_summary.topics | default([]) | tojson | safe }}
+</script>
+
 {% endblock %}
 
 {% block extra_js %}
@@ -291,88 +301,94 @@
         const gridColor = isDark ? '#334155' : '#e2e8f0';
         
         // --- Academic Chart ---
-        {% if acad_summary.subjects %}
-        const rawAcademicData = {{ acad_summary.subjects | tojson | safe }};
-        const acadCtx = document.getElementById('academicChart').getContext('2d');
-        const subjectLabels = rawAcademicData.map(s => s.name);
-        const attendanceData = rawAcademicData.map(s => s.attendance_percent);
-        
-        new Chart(acadCtx, {
-            type: 'bar',
-            data: {
-                labels: subjectLabels,
-                datasets: [{
-                    label: 'Attendance %',
-                    data: attendanceData,
-                    backgroundColor: 'rgba(59, 130, 246, 0.7)',
-                    borderColor: 'rgb(59, 130, 246)',
-                    borderWidth: 1,
-                    borderRadius: 4
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                scales: {
-                    y: { 
-                        beginAtZero: true, 
-                        max: 100,
-                        grid: { color: gridColor },
-                        ticks: { color: textColor }
+        const acadDataEl = document.getElementById('academicData');
+        if (acadDataEl && acadDataEl.textContent.trim()) {
+            const rawAcademicData = JSON.parse(acadDataEl.textContent);
+            if (rawAcademicData && rawAcademicData.length > 0) {
+                const acadCtx = document.getElementById('academicChart').getContext('2d');
+                const subjectLabels = rawAcademicData.map(s => s.name);
+                const attendanceData = rawAcademicData.map(s => s.attendance_percent);
+                
+                new Chart(acadCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: subjectLabels,
+                        datasets: [{
+                            label: 'Attendance %',
+                            data: attendanceData,
+                            backgroundColor: 'rgba(59, 130, 246, 0.7)',
+                            borderColor: 'rgb(59, 130, 246)',
+                            borderWidth: 1,
+                            borderRadius: 4
+                        }]
                     },
-                    x: {
-                        grid: { display: false },
-                        ticks: { color: textColor }
-                    }
-                },
-                plugins: {
-                    legend: { display: false }
-                }
-            }
-        });
-        {% endif %}
-        
-        // --- Coding Chart (Topic Progress) ---
-        {% if coding_summary.attempted > 0 and coding_summary.topics %}
-        const rawCodingTopics = {{ coding_summary.topics | tojson | safe }};
-        const codingCtx = document.getElementById('codingChart').getContext('2d');
-        
-        // Filter out topics with 0 solved to keep chart clean
-        const topics = rawCodingTopics
-            .filter(t => t.solved > 0)
-            .map(t => ({
-                label: t.topic.charAt(0).toUpperCase() + t.topic.slice(1), // Capitalize
-                solved: t.solved,
-                total: t.total
-            }));
-        
-        if (topics.length > 0) {
-            new Chart(codingCtx, {
-                type: 'doughnut',
-                data: {
-                    labels: topics.map(t => t.label),
-                    datasets: [{
-                        data: topics.map(t => t.solved),
-                        backgroundColor: [
-                            '#3b82f6', '#10b981', '#f59e0b', '#ec4899', '#8b5cf6', '#14b8a6', '#f43f5e'
-                        ],
-                        borderWidth: 0
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    cutout: '70%',
-                    plugins: {
-                        legend: {
-                            position: 'right',
-                            labels: { color: textColor, boxWidth: 12 }
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: { 
+                                beginAtZero: true, 
+                                max: 100,
+                                grid: { color: gridColor },
+                                ticks: { color: textColor }
+                            },
+                            x: {
+                                grid: { display: false },
+                                ticks: { color: textColor }
+                            }
+                        },
+                        plugins: {
+                            legend: { display: false }
                         }
                     }
-                }
-            });
+                });
+            }
         }
-        {% endif %}
+        
+        // --- Coding Chart (Topic Progress) ---
+        const codingDataEl = document.getElementById('codingData');
+        if (codingDataEl && codingDataEl.textContent.trim()) {
+            const rawCodingTopics = JSON.parse(codingDataEl.textContent);
+            if (rawCodingTopics && rawCodingTopics.length > 0) {
+                const codingCtx = document.getElementById('codingChart').getContext('2d');
+                
+                // Filter out topics with 0 solved to keep chart clean
+                const topics = rawCodingTopics
+                    .filter(t => t.solved > 0)
+                    .map(t => ({
+                        label: t.topic.charAt(0).toUpperCase() + t.topic.slice(1), // Capitalize
+                        solved: t.solved,
+                        total: t.total
+                    }));
+                
+                if (topics.length > 0) {
+                    new Chart(codingCtx, {
+                        type: 'doughnut',
+                        data: {
+                            labels: topics.map(t => t.label),
+                            datasets: [{
+                                data: topics.map(t => t.solved),
+                                backgroundColor: [
+                                    '#3b82f6', '#10b981', '#f59e0b', '#ec4899', '#8b5cf6', '#14b8a6', '#f43f5e'
+                                ],
+                                borderWidth: 0
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            cutout: '70%',
+                            plugins: {
+                                legend: {
+                                    position: 'right',
+                                    labels: { color: textColor, boxWidth: 12 }
+                                }
+                            }
+                        }
+                    });
+                }
+            }
+        }
         
         // --- AI Insights Fetch ---
         function fetchInsights(refresh=false) {
