@@ -99,7 +99,7 @@
         </div>
         <div class="stat-content">
             <h3>Avg Attendance</h3>
-            <p>{{ acad_summary.avg_attendance }}%</p>
+            <p>{{ acad_summary.overall_attendance }}%</p>
         </div>
     </div>
     
@@ -279,8 +279,6 @@
     </div>
 </div>
 
-</div>
-
 <!-- Data injected for JavaScript -->
 <script id="academicData" type="application/json">
     {{ acad_summary.subjects | default([]) | tojson | safe }}
@@ -307,7 +305,7 @@
             if (rawAcademicData && rawAcademicData.length > 0) {
                 const acadCtx = document.getElementById('academicChart').getContext('2d');
                 const subjectLabels = rawAcademicData.map(s => s.name);
-                const attendanceData = rawAcademicData.map(s => s.attendance_percent);
+                const attendanceData = rawAcademicData.map(s => s.attendance_percentage);
                 
                 new Chart(acadCtx, {
                     type: 'bar',

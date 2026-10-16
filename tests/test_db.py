@@ -19,7 +19,7 @@ def test_academic_db_write_roundtrip(app):
         # Insert Mark
         db.execute(
             'INSERT INTO marks (user_id, subject_id, exam_type, marks_obtained, max_marks) VALUES (?, ?, ?, ?, ?)',
-            (2, 10, 'Midterm', 85, 100)
+            (2, 10, 'midterm', 85, 100)
         )
         db.commit()
         
@@ -32,6 +32,6 @@ def test_academic_db_write_roundtrip(app):
         
         assert mark is not None
         assert mark['subject_name'] == 'Data Structures'
-        assert mark['exam_type'] == 'Midterm'
+        assert mark['exam_type'] == 'midterm'
         assert mark['marks_obtained'] == 85
         assert mark['max_marks'] == 100

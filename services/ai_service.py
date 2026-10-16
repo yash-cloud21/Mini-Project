@@ -109,7 +109,7 @@ def generate_profile_insights(user_id, acad_data, coding_data, career_data, forc
     Review the student's current profile summary and provide 3-4 bullet points of encouraging, actionable advice on what they should focus on next to improve their readiness for their target role.
     Keep the response under 150 words. Format as Markdown.
     
-    Academic Data: Avg Attendance: {acad_data.get('avg_attendance', 'N/A')}%.
+    Academic Data: Avg Attendance: {acad_data.get('overall_attendance', 'N/A')}%.
     Coding Data: Solved {coding_data.get('solved', 0)} out of {coding_data.get('total', 0)} problems.
     Career Target: {career_data.get('target_role', {}).get('title', 'None Selected')}.
     Missing Skills for Target Role: {', '.join(career_data.get('missing_skills', []))}
@@ -123,7 +123,7 @@ def generate_profile_insights(user_id, acad_data, coding_data, career_data, forc
         # Fallback logic
         fallback_text = "### Rule-based Recommendations\n"
         
-        if acad_data.get('avg_attendance', 100) < 75:
+        if acad_data.get('overall_attendance', 100) < 75:
             fallback_text += "- **Academics**: Your attendance is dropping. Try to attend more classes to keep up with the coursework.\n"
             
         if coding_data.get('solved', 0) == 0:

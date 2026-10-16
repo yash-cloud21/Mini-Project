@@ -9,8 +9,13 @@ Usage inside Flask routes / services:
 
 import os
 import sqlite3
+from datetime import datetime
 
 from flask import g, current_app
+
+# Fix Python 3.12+ DeprecationWarning for default timestamp converter
+sqlite3.register_adapter(datetime, lambda d: d.isoformat())
+sqlite3.register_converter("timestamp", lambda s: datetime.fromisoformat(s.decode()))
 
 
 def get_db():

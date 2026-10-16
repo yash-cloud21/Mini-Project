@@ -54,7 +54,7 @@ def resume_feedback():
         
     resume_id = resumes[0]['id']
     resume_details = get_resume_details(resume_id, current_user.id)
-    raw_text = resume_details.raw_text if resume_details else ""
+    raw_text = resume_details.get('raw_text', '') if resume_details else ""
     
     # Get target role
     career_match = analyze_skill_gap(current_user.id)
